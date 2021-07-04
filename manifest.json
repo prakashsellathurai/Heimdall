@@ -1,0 +1,22 @@
+{
+  "manifest_version": 2,
+  "name": "heimdall",
+  "version": "1.0",
+  "description": "All-seeing content Curator",
+  "icons": {
+    "240": "./images/icon240.png"
+  },
+  "browser_action": {
+    "default_title": "Heimdall",
+    "default_icon": "./images/icon240.png",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "page": "main.html"
+  },
+  "permissions": [
+    "tabs",
+    "https://news.ycombinator.com/"
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval' https://news.ycombinator.com; object-src 'self' 'unsafe-eval' https://news.ycombinator.com"
+}

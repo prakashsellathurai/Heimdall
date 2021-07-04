@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="./js/core.js"></script>
+  <script src="./js/main.js"></script>
+  <script src="./js/popup.js"></script>
+  <link href="./css/style.css" rel="stylesheet" type="text/css" />
+  <style>
+    body {
+      overflow: hidden;
+    }
+
+    #container,
+    #spinner {
+      width: 350px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="spinner" style="display:none">
+    <img src="./images/Hourglass.gif">
+  </div>
+  <div id="container" class="popup-container">
+    <div id="header">
+      <a id="title" href="https://news.ycombinator.com">Hacker News</a>
+    </div>
+
+    <table id="feed" cellspacing="3" cellpadding="0">
+    </table>
+
+
+
+    <div id="footer">
+      <div class="right">
+        <a href="" id="refresh">Refresh</a> | <a href="https://github.com/prakashsellathurai/Heimdall/">submit an
+          issue</a>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
