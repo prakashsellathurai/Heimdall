@@ -4,11 +4,11 @@
   "version": "1.0",
   "description": "All-seeing content Curator",
   "icons": {
-    "240": "./images/icon240.png"
+    "48": "./images/icon48.png"
   },
   "browser_action": {
     "default_title": "Heimdall",
-    "default_icon": "./images/icon240.png",
+    "default_icon": "./images/icon48.png",
     "default_popup": "popup.html"
   },
   "background": {
