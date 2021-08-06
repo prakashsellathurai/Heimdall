@@ -6,7 +6,7 @@ var OnFeedFail = null;
 var retryMilliseconds = 120000;
 
 function SetInitialOption(key, value) {
-  if (localStorage[key] == null) {
+  if (localStorage[key] === null) {
     localStorage[key] = value;
   }
 }
@@ -17,8 +17,8 @@ function UpdateIfReady(force) {
   var nextRefresh = lastRefresh + interval;
   var curTime = parseFloat((new Date()).getTime());
   var isReady = (curTime > nextRefresh);
-  var isNull = (localStorage["HN.LastRefresh"] == null);
-  if ((force == true) || (localStorage["HN.LastRefresh"] == null)) {
+  var isNull = (localStorage["HN.LastRefresh"] === null);
+  if ((force == true) || (localStorage["HN.LastRefresh"] === null)) {
     UpdateFeed();
   }
   else {
@@ -136,7 +136,7 @@ function SaveLinksToLocalStorage(links) {
 
 function RetrieveLinksFromLocalStorage() {
   var numLinks = localStorage["HN.NumLinks"];
-  if (numLinks == null) {
+  if (numLinks === null) {
     return null;
   }
   else {
