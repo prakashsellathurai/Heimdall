@@ -1,0 +1,12 @@
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background rounded square -->
+  <rect x="10" y="10" width="180" height="180" rx="20" fill="white" stroke="#FF6600" stroke-width="5"/>
+  <!-- Header bar representing a browser window -->
+  <rect x="10" y="10" width="180" height="40" rx="10" fill="#FF6600"/>
+  <!-- "HN" Text -->
+  <text x="100" y="115" font-family="Arial, sans-serif" font-size="60" fill="#FF6600" text-anchor="middle" dominant-baseline="middle" font-weight="bold">
+    HN
+  </text>
+  <!-- Bookmark icon to hint at curation -->
+  <path d="M150,150 L150,170 Q150,175 155,175 L165,175 Q170,175 170,170 L170,150 Z" fill="#FF6600"/>
+</svg>

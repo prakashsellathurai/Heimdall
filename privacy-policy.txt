@@ -1,0 +1,67 @@
+**Privacy Policy for Heimndall**
+
+_Last updated: March 4, 2025_
+
+Heimndall ("we", "our", "us") is committed to protecting your privacy. This Privacy Policy outlines how we collect, use, and safeguard information in connection with our Chrome extension (the "Extension") while strictly adhering to its core functionality and the Developer Program Policies.
+
+---
+
+### 1. Information We Collect
+- **Minimal Data Collection:**  
+  The Extension collects only the information essential to its core functionality. For example, it may access details such as the active tab’s URL or title to provide its intended features.
+- **No Unnecessary Personal Data:**  
+  We do not collect personal data beyond what is necessary for the Extension to function properly.
+
+---
+
+### 2. Use of Information
+- **Purpose-Driven Use:**  
+  Any data collected is used solely to support and enhance the Extension's single, core purpose.
+- **No Unrelated Purposes:**  
+  We do not use or transfer user data for any purposes that are unrelated to the Extension’s functionality.
+- **Credit and Lending:**  
+  Under no circumstances is user data used to determine creditworthiness or for lending purposes.
+
+---
+
+### 3. Data Sharing and Disclosure
+- **No Sale or Unauthorized Transfer:**  
+  We do not sell or transfer user data to third parties except in cases where such transfer is essential for the Extension’s functionality and has been explicitly approved.
+- **Limited Third-Party Access:**  
+  Any third-party service providers that assist with the Extension’s operations are required to adhere to strict privacy standards and are only granted access to the minimal data necessary for their function.
+
+---
+
+### 4. Data Security
+- **Protection Measures:**  
+  We implement reasonable technical and organizational measures to protect your data against unauthorized access, alteration, disclosure, or destruction.
+- **Secure Code Practices:**  
+  All code, including any remotely loaded resources (if applicable), is managed and reviewed to ensure that your data is handled securely.
+
+---
+
+### 5. Your Rights
+- **Access and Control:**  
+  You have the right to review, modify, or request deletion of your personal data, subject to applicable law.
+- **Inquiries:**  
+  If you have any questions, concerns, or requests regarding your data, please contact us using the information provided below.
+
+---
+
+### 6. Changes to This Privacy Policy
+- **Policy Updates:**  
+  We may update this Privacy Policy from time to time. Any material changes will be communicated via the Extension or our website.
+- **Continued Use:**  
+  Continued use of the Extension after any changes signifies your acceptance of the revised policy.
+
+---
+
+### 7. Contact Information
+If you have any questions or concerns regarding this Privacy Policy, please contact us at:
+
+**Name:** Prakash S  
+**Email:** prakashsellathurai@gmail.com
+
+---
+
+By using Heimndall, you acknowledge that you have read and understood this Privacy Policy and agree to the practices described herein.
