@@ -15,7 +15,7 @@
     "page": "main.html"
   },
   "permissions": [
-    "tabs",
+    "tabs"
   ],
   "host_permissions": [
     "https://news.ycombinator.com/"
