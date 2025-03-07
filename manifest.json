@@ -6,7 +6,7 @@
   "icons": {
     "48": "./images/icon48.png"
   },
-  "browser_action": {
+  "action": {
     "default_title": "Heimdall",
     "default_icon": "./images/icon48.png",
     "default_popup": "popup.html"
@@ -14,14 +14,8 @@
   "background": {
     "page": "main.html"
   },
-  "permissions": [
-    "tabs"
-  ],
+  "permissions": [],
   "host_permissions": [
     "https://news.ycombinator.com/"
-  ],
-  "content_security_policy": {
-    "extension_pages": "script-src 'self' 'unsafe-eval'; object-src 'self' 'unsafe-eval'",
-    "sandbox": "script-src 'self' 'unsafe-eval' https://news.ycombinator.com; object-src 'self' 'unsafe-eval' https://news.ycombinator.com"
-  }
+  ]
 }
