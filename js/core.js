@@ -43,7 +43,7 @@ function UpdateFeed() {
 }
 
 function onRssSuccess(doc) {
-  console.log('doc', doc);
+  
   if (!doc) {
     handleFeedParsingFailed("Not a valid feed.");
     return;
