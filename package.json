@@ -1,0 +1,15 @@
+{
+    "name": "heimdall",
+    "version": "1.0.0",
+    "description": "All-seeing content Curator - Hacker News browser extension",
+    "private": true,
+    "scripts": {
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "test:coverage": "jest --coverage"
+    },
+    "devDependencies": {
+        "jest": "^29.7.0",
+        "jest-environment-jsdom": "^29.7.0"
+    }
+}

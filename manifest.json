@@ -3,6 +3,12 @@
   "name": "heimdall",
   "version": "1.0",
   "description": "All-seeing content Curator",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "heimdall@prakashsellathurai.github.io",
+      "strict_min_version": "109.0"
+    }
+  },
   "icons": {
     "48": "./images/icon48.png"
   },
@@ -12,7 +18,11 @@
     "default_popup": "popup.html"
   },
   "background": {
-    "page": "main.html"
+    "service_worker": "js/background.js",
+    "scripts": [
+      "js/core.js",
+      "js/main.js"
+    ]
   },
   "permissions": [],
   "host_permissions": [

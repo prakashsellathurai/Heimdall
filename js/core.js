@@ -43,7 +43,7 @@ function UpdateFeed() {
 }
 
 function onRssSuccess(doc) {
-  
+
   if (!doc) {
     handleFeedParsingFailed("Not a valid feed.");
     return;
@@ -181,7 +181,7 @@ function openUrl(url, take_focus) {
   if (url.indexOf("http:") != 0 && url.indexOf("https:") != 0) {
     return;
   }
-  chrome.tabs.create({ url: url, selected: take_focus });
+  (typeof browser !== "undefined" ? browser : chrome).tabs.create({ url: url, active: take_focus });
 }
 
 function hideElement(id) {
