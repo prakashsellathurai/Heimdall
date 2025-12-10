@@ -1,24 +1,28 @@
 {
   "manifest_version": 3,
   "name": "heimdall",
-  "version": "1.0",
+  "version": "1.0.1",
   "description": "All-seeing content Curator",
   "browser_specific_settings": {
     "gecko": {
       "id": "heimdall@prakashsellathurai.github.io",
-      "strict_min_version": "109.0"
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
     }
   },
   "icons": {
-    "48": "./images/icon48.png"
+    "48": "images/icon48.png"
   },
   "action": {
     "default_title": "Heimdall",
-    "default_icon": "./images/icon48.png",
+    "default_icon": "images/icon48.png",
     "default_popup": "popup.html"
   },
   "background": {
-    "service_worker": "js/background.js",
     "scripts": [
       "js/core.js",
       "js/main.js"
