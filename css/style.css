@@ -30,3 +30,28 @@ a:hover {text-decoration:underline;}
 #OptionsPage p { color:#828282;}
 #OptionsPage a {text-decoration:underline;}
 #OptionsPage #feed {margin-left:10px;}
+
+#tabs {
+  display: flex;
+  background: #f0f0f0;
+  border-bottom: 1px solid #ccc;
+}
+.tab-button {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 10pt;
+  color: #555;
+  outline: none;
+}
+.tab-button.active {
+  background: #F6F6EF;
+  font-weight: bold;
+  color: #000;
+  border-bottom: 2px solid #ff6600;
+}
+.tab-button:hover {
+  background: #e0e0e0;
+}

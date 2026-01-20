@@ -5,68 +5,75 @@ var OnFeedSuccess = null;
 var OnFeedFail = null;
 var retryMilliseconds = 120000;
 
+var FEEDS = {
+  "HN": "https://news.ycombinator.com/rss",
+  "LWN": "https://lwn.net/headlines/rss"
+};
+
 function SetInitialOption(key, value) {
-  if (localStorage[key] === null) {
+  if (localStorage[key] === undefined || localStorage[key] === null) {
     localStorage[key] = value;
   }
 }
 
-function UpdateIfReady(force) {
-  var lastRefresh = parseFloat(localStorage["HN.LastRefresh"]);
-  var interval = parseFloat(localStorage["HN.RequestInterval"]);
+function UpdateIfReady(feedKey, force) {
+  var lastRefresh = parseFloat(localStorage[feedKey + ".LastRefresh"]);
+  var interval = parseFloat(localStorage[feedKey + ".RequestInterval"]);
   var nextRefresh = lastRefresh + interval;
   var curTime = parseFloat((new Date()).getTime());
   var isReady = (curTime > nextRefresh);
-  var isNull = (localStorage["HN.LastRefresh"] === null);
-  if ((force == true) || (localStorage["HN.LastRefresh"] === null)) {
-    UpdateFeed();
+  if ((force == true) || isNaN(lastRefresh)) {
+    UpdateFeed(feedKey);
   }
   else {
     if (isReady) {
-      UpdateFeed();
+      UpdateFeed(feedKey);
     }
   }
 }
 
-function UpdateFeed() {
+function UpdateFeed(feedKey) {
   var xhr = new XMLHttpRequest();
-  xhr.open('GET', 'https://news.ycombinator.com/rss');
+  var url = FEEDS[feedKey];
+  if (!url) return;
+
+  xhr.open('GET', url);
   xhr.onload = function () {
     if (xhr.status === 200) {
-      onRssSuccess(xhr.responseText);
+      onRssSuccess(feedKey, xhr.responseText);
     }
     else {
-      onRssError();
+      onRssError(feedKey);
     }
   };
   xhr.send();
 }
 
-function onRssSuccess(doc) {
-
+function onRssSuccess(feedKey, doc) {
   if (!doc) {
-    handleFeedParsingFailed("Not a valid feed.");
+    handleFeedParsingFailed(feedKey, "Not a valid feed.");
     return;
   }
-  links = parseHNLinks(doc);
-  SaveLinksToLocalStorage(links);
+  var links = parseFeedLinks(doc);
+  SaveLinksToLocalStorage(feedKey, links);
   if (buildPopupAfterResponse == true) {
     buildPopup(links);
     buildPopupAfterResponse = false;
   }
-  localStorage["HN.LastRefresh"] = (new Date()).getTime();
+  localStorage[feedKey + ".LastRefresh"] = (new Date()).getTime();
 }
 
-function updateLastRefreshTime() {
-  localStorage["HN.LastRefresh"] = (new Date()).getTime();
+function updateLastRefreshTime(feedKey) {
+  localStorage[feedKey + ".LastRefresh"] = (new Date()).getTime();
 }
 
-function onRssError(xhr, type, error) {
-  handleFeedParsingFailed('Failed to fetch RSS feed.');
+function onRssError(feedKey, xhr, type, error) {
+  handleFeedParsingFailed(feedKey, 'Failed to fetch RSS feed.');
 }
 
-function handleFeedParsingFailed(error) {
-  localStorage["HN.LastRefresh"] = localStorage["HN.LastRefresh"] + retryMilliseconds;
+function handleFeedParsingFailed(feedKey, error) {
+  var lastRefresh = parseFloat(localStorage[feedKey + ".LastRefresh"]) || (new Date()).getTime();
+  localStorage[feedKey + ".LastRefresh"] = lastRefresh + retryMilliseconds;
 }
 
 function parseXml(xml) {
@@ -83,7 +90,7 @@ function parseXml(xml) {
   return xmlDoc;
 }
 
-function parseHNLinks(rawXmlStr) {
+function parseFeedLinks(rawXmlStr) {
   var parser = new DOMParser();
   var doc = parser.parseFromString(rawXmlStr, "text/xml");
   var entries = doc.getElementsByTagName('entry');
@@ -93,60 +100,68 @@ function parseHNLinks(rawXmlStr) {
   var count = Math.min(entries.length, maxFeedItems);
   var links = new Array();
   for (var i = 0; i < count; i++) {
-    item = entries.item(i);
-    var hnLink = new Object();
+    var item = entries.item(i);
+    var feedLink = new Object();
     //Grab the title
     var itemTitle = item.getElementsByTagName('title')[0];
     if (itemTitle) {
-      hnLink.Title = itemTitle.textContent;
+      feedLink.Title = itemTitle.textContent;
     } else {
-      hnLink.Title = "Unknown Title";
+      feedLink.Title = "Unknown Title";
     }
 
     //Grab the Link
     var itemLink = item.getElementsByTagName('link')[0];
-    if (!itemLink) {
-      itemLink = item.getElementsByTagName('comments')[0];
-    }
-    if (itemLink) {
-      hnLink.Link = itemLink.textContent;
+    if (!itemLink || !itemLink.textContent) {
+      // Check for attribute link if textContent is empty (Atom format)
+      if (itemLink && itemLink.getAttribute('href')) {
+        feedLink.Link = itemLink.getAttribute('href');
+      } else {
+        itemLink = item.getElementsByTagName('comments')[0];
+        if (itemLink) {
+          feedLink.Link = itemLink.textContent;
+        } else {
+          feedLink.Link = '';
+        }
+      }
     } else {
-      hnLink.Link = '';
+      feedLink.Link = itemLink.textContent;
     }
 
     //Grab the comments link
     var commentsLink = item.getElementsByTagName('comments')[0];
     if (commentsLink) {
-      hnLink.CommentsLink = commentsLink.textContent;
+      feedLink.CommentsLink = commentsLink.textContent;
     } else {
-      hnLink.CommentsLink = '';
+      feedLink.CommentsLink = '';
     }
 
-    links.push(hnLink);
+    links.push(feedLink);
   }
   return links;
 }
 
-function SaveLinksToLocalStorage(links) {
-  localStorage["HN.NumLinks"] = links.length;
+function SaveLinksToLocalStorage(feedKey, links) {
+  localStorage[feedKey + ".NumLinks"] = links.length;
   for (var i = 0; i < links.length; i++) {
-    localStorage["HN.Link" + i] = JSON.stringify(links[i]);
+    localStorage[feedKey + ".Link" + i] = JSON.stringify(links[i]);
   }
 }
 
-function RetrieveLinksFromLocalStorage() {
-  var numLinks = localStorage["HN.NumLinks"];
-  if (numLinks === null) {
+function RetrieveLinksFromLocalStorage(feedKey) {
+  var numLinks = localStorage[feedKey + ".NumLinks"];
+  if (numLinks === undefined || numLinks === null) {
     return null;
   }
   else {
     var links = new Array();
     for (var i = 0; i < numLinks; i++) {
-      links.push(JSON.parse(localStorage["HN.Link" + i]))
+      links.push(JSON.parse(localStorage[feedKey + ".Link" + i]))
     }
     return links;
   }
 }
+
 
 
 function openLink(e) {

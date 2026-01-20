@@ -30,6 +30,7 @@
   },
   "permissions": [],
   "host_permissions": [
-    "https://news.ycombinator.com/"
+    "https://news.ycombinator.com/",
+    "https://lwn.net/"
   ]
 }
