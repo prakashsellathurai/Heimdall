@@ -11,20 +11,9 @@ Heimdall is a Hacker News (HN) content curator available as a browser extension.
 
 ## Installation
 
-### Chrome
-
-Install Heimdall from the Chrome Web Store:
-
 [Install Heimdall for Chrome](https://chromewebstore.google.com/detail/kicalmkcgkhjgpijjclbnpodjppniank?utm_source=item-share-cb)
 
-### Firefox
-
-Install Heimdall as a temporary add-on for development:
-
-1. Open Firefox and navigate to `about:debugging`
-2. Click "This Firefox" in the sidebar
-3. Click "Load Temporary Add-on..."
-4. Select the `manifest.json` file from the Heimdall directory
+[Install Heimdall for Firefox](https://addons.mozilla.org/en-US/firefox/addon/heimdall-feed-curator/)
 
 ## Usage
 
