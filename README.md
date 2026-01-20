@@ -1,6 +1,6 @@
 # Heimdall
 
-Heimdall is a Hacker News (HN) content curator available as a browser extension. It helps you stay updated with the latest HN news and discussions directly from your browser.
+Heimdall is a Hacker News (HN)/LWN.net content curator available as a browser extension. It helps you stay updated with the latest HN news and discussions directly from your browser.
 
 ## Features
 
