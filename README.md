@@ -1,13 +1,16 @@
 # Heimdall
 
-Heimdall is a Hacker News (HN)/LWN.net content curator available as a browser extension. It helps you stay updated with the latest HN news and discussions directly from your browser.
+Heimdall is a feature-rich RSS feed curator available as a browser extension. It helps you stay updated with the latest news from Hacker News (HN), LWN.net, and any other RSS feeds you care about, all in one place.
 
 ## Features
 
-- Fetches the latest HN news and discussions.
-- Displays the news in a clean and organized manner.
-- Allows you to open links and comments in new tabs.
-- Refreshes the news feed with a single click.
+- **Multi-Feed Support**: Comes with HN and LWN by default, but you can add any RSS/Atom feed.
+- **Unified Dashboard**: View all your feeds in a beautiful, unified dashboard.
+- **Article Preview**: Preview articles directly within the dashboard without leaving the extension.
+- **Customizable**: Add, remove, and manage your own feeds.
+- **Service Worker Migration**: Migrated to manifest V3 with service workers for better performance and efficiency.
+- **Content Filtering**: Uses declarative net request to handle content filtering for seamless previews.
+- **Clean Interface**: Displays news in an organized, readable manner.
 
 ## Installation
 
@@ -17,11 +20,11 @@ Heimdall is a Hacker News (HN)/LWN.net content curator available as a browser ex
 
 ## Usage
 
-1. Click on the Heimdall icon in your browser toolbar.
-2. The popup will display the latest HN news and discussions.
-3. Click on any news title to open the link.
-4. Click on the comments link to view the discussion.
-5. Use the refresh button to update the news feed.
+1. **Popup**: Click on the Heimdall icon for a quick view of your feeds or a mixed "Home" feed.
+2. **Dashboard**: Click on "Dashboard" in the popup to open the full-page management interface.
+3. **Add Feeds**: In the Dashboard, use the "Add Feed" section to include your favorite RSS URLs.
+4. **Preview**: Click on any article title in the Dashboard to open the side preview panel.
+5. **Manage**: Remove feeds you no longer want with a single click.
 
 ## Contributing
 

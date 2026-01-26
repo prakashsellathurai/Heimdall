@@ -25,6 +25,33 @@ describe('Core Functions', () => {
         });
     });
 
+    describe('Feed Management', () => {
+        beforeEach(() => {
+            localStorage.clear();
+        });
+
+        it('should load default feeds when none are stored', () => {
+            const feeds = LoadFeeds();
+            expect(feeds).toHaveProperty('HN');
+            expect(feeds).toHaveProperty('LWN');
+            expect(JSON.parse(localStorage["Heimdall.Feeds"])).toEqual(DEFAULT_FEEDS);
+        });
+
+        it('should add a new feed', () => {
+            AddFeed('TestFeed', 'https://test.com/rss');
+            const feeds = LoadFeeds();
+            expect(feeds).toHaveProperty('TestFeed', 'https://test.com/rss');
+        });
+
+        it('should remove an existing feed', () => {
+            AddFeed('TestFeed', 'https://test.com/rss');
+            RemoveFeed('TestFeed');
+            const feeds = LoadFeeds();
+            expect(feeds).not.toHaveProperty('TestFeed');
+        });
+    });
+
+
     describe('parseFeedLinks', () => {
         const sampleHnRss = `<?xml version="1.0" encoding="UTF-8"?>
       <rss version="2.0">

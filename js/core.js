@@ -117,8 +117,11 @@ function UpdateFeed(feedKey, callback) {
       onRssSuccess(feedKey, xhr.responseText, callback);
     }
     else {
-      onRssError(feedKey);
+      onRssError(feedKey, xhr, null, null, callback);
     }
+  };
+  xhr.onerror = function () {
+    onRssError(feedKey, xhr, null, null, callback);
   };
   xhr.send();
 }
@@ -146,8 +149,11 @@ function updateLastRefreshTime(feedKey) {
   localStorage[feedKey + ".LastRefresh"] = (new Date()).getTime();
 }
 
-function onRssError(feedKey, xhr, type, error) {
+function onRssError(feedKey, xhr, type, error, callback) {
   handleFeedParsingFailed(feedKey, 'Failed to fetch RSS feed.');
+  if (callback) {
+    callback([]);
+  }
 }
 
 function handleFeedParsingFailed(feedKey, error) {
