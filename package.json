@@ -1,6 +1,6 @@
 {
     "name": "heimdall",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "description": "All-seeing content Curator - Hacker News browser extension",
     "private": true,
     "scripts": {
