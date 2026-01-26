@@ -23,6 +23,11 @@ function setupDashboardEvents() {
     });
 
     document.getElementById('add-feed-btn').addEventListener('click', handleAddFeedDashboard);
+    setupPreviewEvents();
+}
+
+function setupPreviewEvents() {
+    document.getElementById('close-preview-btn').onclick = closePreview;
 }
 
 function showView(viewId, feedKey) {
@@ -78,26 +83,52 @@ function renderSidebarFeeds() {
     }
 }
 
-function renderArticle(item, sourceName) {
+function renderArticle(item, id) {
     var card = document.createElement('div');
     card.className = 'article-card';
 
     var title = document.createElement('a');
     title.className = 'article-title';
     title.href = item.Link;
-    title.textContent = item.Title;
-    title.target = "_blank";
+    title.textContent = id + ". " + item.Title;
+    title.onclick = function (e) {
+        e.preventDefault();
+        openInPreview(item.Link);
+    };
+    card.appendChild(title);
 
     if (item.CommentsLink) {
         var meta = document.createElement('a');
         meta.className = 'article-meta';
         meta.href = item.CommentsLink;
-        meta.target = "_blank";
         meta.textContent = "  |  (comments)";
-        title.append(meta);
+        meta.onclick = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            openInPreview(item.CommentsLink);
+        };
+        card.appendChild(meta);
     }
-    card.appendChild(title);
     return card;
+}
+
+function openInPreview(url) {
+    var panel = document.getElementById('preview-panel');
+    var frame = document.getElementById('preview-frame');
+    var urlDisplay = document.getElementById('preview-url');
+
+    frame.src = url;
+    urlDisplay.textContent = url;
+    panel.classList.add('open');
+}
+
+function closePreview() {
+    var panel = document.getElementById('preview-panel');
+    var frame = document.getElementById('preview-frame');
+    panel.classList.remove('open');
+    setTimeout(() => {
+        frame.src = 'about:blank';
+    }, 300);
 }
 
 function renderHomeFeed() {
@@ -110,8 +141,9 @@ function renderHomeFeed() {
             container.innerHTML = 'No articles found. Add some feeds in Settings!';
             return;
         }
+        var id = 1;
         links.forEach(link => {
-            container.appendChild(renderArticle(link));
+            container.appendChild(renderArticle(link, id++));
         });
     });
 }
@@ -128,8 +160,9 @@ function renderIndividualFeed(feedKey) {
             container.innerHTML = 'No articles found in this feed.';
             return;
         }
+        var id = 1;
         links.forEach(link => {
-            container.appendChild(renderArticle(link));
+            container.appendChild(renderArticle(link, id++));
         });
     });
 }

@@ -6,7 +6,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "heimdall@prakashsellathurai.github.io",
-      "strict_min_version": "140.0",
+      "strict_min_version": "109.0",
       "data_collection_permissions": {
         "required": [
           "none"
@@ -23,19 +23,27 @@
     "default_popup": "popup.html"
   },
   "background": {
-    "scripts": [
-      "js/core.js",
-      "js/main.js"
-    ]
+    "service_worker": "js/background-wrapper.js"
   },
   "options_ui": {
     "page": "dashboard.html",
     "open_in_tab": true
   },
-  "permissions": [],
+  "permissions": [
+    "declarativeNetRequest",
+    "declarativeNetRequestFeedback",
+    "storage"
+  ],
   "host_permissions": [
-    "https://news.ycombinator.com/",
-    "https://lwn.net/",
-    "https://ourworldindata.org/"
-  ]
+    "<all_urls>"
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_1",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  }
 }

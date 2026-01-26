@@ -216,8 +216,6 @@ a#title {
 .article-card {
   background: #fff;
   padding: 10px;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #eee;
 }
 
 .article-title {
@@ -247,4 +245,60 @@ a#title {
   background: #ff4444;
   color: #fff;
   border: none;
+}
+
+/* Preview Panel */
+#preview-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+#preview-panel.open {
+  transform: translateX(0);
+}
+
+#preview-header {
+  padding: 10px;
+  background: #f0f0f0;
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#preview-url {
+  font-size: 9pt;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80%;
+}
+
+#close-preview-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #888;
+}
+
+#close-preview-btn:hover {
+  color: #000;
+}
+
+#preview-frame {
+  flex: 1;
+  border: none;
+  width: 100%;
 }
