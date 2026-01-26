@@ -1,0 +1,12 @@
+/* CSS Mockup / Inspiration */
+:root {
+    --primary-gradient: linear-gradient(315deg, #eec0c6 0%, #7ee8fa 74%);
+    --accent-color: #7ee8fa;
+    --bg-color: #F6F6EF;
+    /* Legacy HN feel but refreshed */
+    --text-primary: #222;
+    --text-secondary: #828282;
+    --border-radius: 8px;
+}
+
+/* ... rest of design tokens ... */

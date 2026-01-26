@@ -1,12 +1,17 @@
-var currentFeed = "HN";
+var currentFeed = localStorage["Heimdall.LastPopupFeed"] || "Home";
 
 window.onload = function () {
+  renderTabs();
   main();
   setupEvents();
 };
 
 function setupEvents() {
   document.getElementById("refresh").addEventListener('click', refreshLinks, false);
+  document.getElementById("open-options").addEventListener('click', function (e) {
+    e.preventDefault();
+    (typeof browser !== "undefined" ? browser : chrome).runtime.openOptionsPage();
+  }, false);
 
   var tabs = document.querySelectorAll('.tab-button');
   tabs.forEach(function (tab) {
@@ -16,10 +21,34 @@ function setupEvents() {
   });
 }
 
+function renderTabs() {
+  var feeds = LoadFeeds();
+  var tabsContainer = document.getElementById("tabs");
+  tabsContainer.innerHTML = '';
+
+  // Add Home Tab
+  var homeBtn = document.createElement("button");
+  homeBtn.className = "tab-button" + (currentFeed === "Home" ? " active" : "");
+  homeBtn.setAttribute("data-feed", "Home");
+  homeBtn.innerText = "Home";
+  tabsContainer.appendChild(homeBtn);
+
+  for (var key in feeds) {
+    if (feeds.hasOwnProperty(key)) {
+      var btn = document.createElement("button");
+      btn.className = "tab-button" + (currentFeed === key ? " active" : "");
+      btn.setAttribute("data-feed", key);
+      btn.innerText = key;
+      tabsContainer.appendChild(btn);
+    }
+  }
+}
+
 function switchTab(feedKey) {
   if (currentFeed === feedKey) return;
 
   currentFeed = feedKey;
+  localStorage["Heimdall.LastPopupFeed"] = currentFeed;
 
   // Update UI
   document.querySelectorAll('.tab-button').forEach(function (btn) {
@@ -31,22 +60,35 @@ function switchTab(feedKey) {
   });
 
   // Re-build popup
-  buildPopup(RetrieveLinksFromLocalStorage(currentFeed));
+  if (currentFeed === "Home") {
+    GetMixedFeed(function (links) {
+      buildPopup(links);
+    });
+  } else {
+    var cached = RetrieveLinksFromLocalStorage(currentFeed);
+    buildPopup(cached);
 
-  // If no links cached, update
-  if (!RetrieveLinksFromLocalStorage(currentFeed)) {
-    refreshLinks();
+    // If no links cached, update
+    if (!cached) {
+      refreshLinks();
+    }
   }
 }
 
 function main() {
-  var links = RetrieveLinksFromLocalStorage(currentFeed);
-  if (links === null) {
-    buildPopupAfterResponse = true;
-    UpdateFeed(currentFeed);
-  }
-  else {
-    buildPopup(links);
+  if (currentFeed === "Home") {
+    GetMixedFeed(function (links) {
+      buildPopup(links);
+    });
+  } else {
+    var links = RetrieveLinksFromLocalStorage(currentFeed);
+    if (links === null) {
+      buildPopupAfterResponse = true;
+      UpdateFeed(currentFeed);
+    }
+    else {
+      buildPopup(links);
+    }
   }
 }
 

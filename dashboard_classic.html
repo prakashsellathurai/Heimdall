@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Heimdall Dashboard</title>
+    <script src="./js/core.js"></script>
+    <script src="./js/dashboard.js"></script>
+    <link href="./css/style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div id="sidebar">
+        <div class="nav-section">Heimdall</div>
+        <div class="nav-item active" data-view="home">Home</div>
+
+        <div class="nav-section">My Feeds</div>
+        <div id="sidebar-feeds">
+            <!-- Dynamic feeds here -->
+        </div>
+
+        <div class="nav-section">Preferences</div>
+        <div class="nav-item" data-view="settings">Settings</div>
+    </div>
+
+    <div id="main-content">
+        <div id="view-home">
+            <div id="header"><span>Home Feed</span></div>
+            <div id="container">
+                <div id="home-articles">Loading...</div>
+            </div>
+        </div>
+
+        <div id="view-feed" style="display:none">
+            <div id="header"><span id="feed-title">Feed Name</span></div>
+            <div id="container">
+                <div id="feed-articles">Loading articles...</div>
+            </div>
+        </div>
+
+        <div id="view-settings" style="display:none">
+            <div id="header"><span>Settings</span></div>
+            <div id="container">
+                <div class="settings-form">
+                    <h3>Add New Feed</h3>
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="new-feed-name" placeholder="Hacker News">
+                    </div>
+                    <div class="form-group">
+                        <label>RSS URL</label>
+                        <input type="text" id="new-feed-url" placeholder="https://example.com/rss">
+                    </div>
+                    <button id="add-feed-btn" class="btn btn-primary">Add Feed</button>
+                </div>
+
+                <h3>Manage Subscriptions</h3>
+                <div id="manage-feeds-list">
+                    <!-- Management list here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

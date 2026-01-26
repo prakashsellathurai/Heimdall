@@ -28,9 +28,14 @@
       "js/main.js"
     ]
   },
+  "options_ui": {
+    "page": "dashboard.html",
+    "open_in_tab": true
+  },
   "permissions": [],
   "host_permissions": [
     "https://news.ycombinator.com/",
-    "https://lwn.net/"
+    "https://lwn.net/",
+    "https://ourworldindata.org/"
   ]
 }

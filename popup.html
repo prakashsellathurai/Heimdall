@@ -6,38 +6,26 @@
   <script src="./js/main.js"></script>
   <script src="./js/popup.js"></script>
   <link href="./css/style.css" rel="stylesheet" type="text/css" />
-  <style>
-    body {
-      overflow: hidden;
-    }
-
-    #container,
-    #spinner {
-      width: 350px;
-    }
-  </style>
 </head>
 
-<body>
+<body style="overflow: hidden;">
   <div id="spinner" style="display:none">
     <img src="./images/Hourglass.gif">
   </div>
   <div id="container" class="popup-container">
     <div id="tabs">
-      <button class="tab-button active" data-feed="HN">Hacker News</button>
-      <button class="tab-button" data-feed="LWN">LWN</button>
     </div>
 
     <table id="feed" cellspacing="3" cellpadding="0">
     </table>
 
-
-
     <div id="footer">
       <div class="right">
-        <a href="" id="refresh">Refresh</a> | <a href="https://github.com/prakashsellathurai/Heimdall/">submit an
+        <a href="" id="refresh">Refresh</a> | <a href="" id="open-options">Dashboard</a> | <a
+          href="https://github.com/prakashsellathuria/Heimdall/">submit an
           issue</a>
       </div>
+      <div style="clear:both"></div>
     </div>
   </div>
 </body>

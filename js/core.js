@@ -5,10 +5,84 @@ var OnFeedSuccess = null;
 var OnFeedFail = null;
 var retryMilliseconds = 120000;
 
-var FEEDS = {
+var DEFAULT_FEEDS = {
   "HN": "https://news.ycombinator.com/rss",
-  "LWN": "https://lwn.net/headlines/rss"
+  "LWN": "https://lwn.net/headlines/rss",
+  "OWID": "https://ourworldindata.org/atom.xml"
 };
+
+var FEEDS = LoadFeeds();
+
+function LoadFeeds() {
+  var storedFeeds = localStorage["Heimdall.Feeds"];
+  if (storedFeeds) {
+    try {
+      return JSON.parse(storedFeeds);
+    } catch (e) {
+      console.error("Failed to parse stored feeds", e);
+    }
+  }
+  // Initialize with defaults if none stored
+  localStorage["Heimdall.Feeds"] = JSON.stringify(DEFAULT_FEEDS);
+  return DEFAULT_FEEDS;
+}
+
+function SaveFeeds(feeds) {
+  localStorage["Heimdall.Feeds"] = JSON.stringify(feeds);
+  FEEDS = feeds;
+}
+
+function AddFeed(name, url) {
+  var feeds = LoadFeeds();
+  feeds[name] = url;
+  SaveFeeds(feeds);
+  return feeds;
+}
+
+function RemoveFeed(name) {
+  var feeds = LoadFeeds();
+  delete feeds[name];
+  SaveFeeds(feeds);
+  return feeds;
+}
+
+function GetMixedFeed(callback) {
+  var feeds = LoadFeeds();
+  var feedKeys = Object.keys(feeds);
+  var allLinks = [];
+  var completed = 0;
+
+  if (feedKeys.length === 0) {
+    if (callback) callback([]);
+    return;
+  }
+
+  feedKeys.forEach(function (key) {
+    var cached = RetrieveLinksFromLocalStorage(key);
+    if (cached) {
+      allLinks = allLinks.concat(cached.slice(0, 5)); // Take top 5 from each
+      completed++;
+      if (completed === feedKeys.length) {
+        finalizeMixedFeed(allLinks, callback);
+      }
+    } else {
+      UpdateFeed(key, function (links) {
+        allLinks = allLinks.concat(links.slice(0, 5));
+        completed++;
+        if (completed === feedKeys.length) {
+          finalizeMixedFeed(allLinks, callback);
+        }
+      });
+    }
+  });
+}
+
+function finalizeMixedFeed(links, callback) {
+  // Sort by some criteria if needed, or just shuffle/alternate
+  // For now, let's just reverse or keep as is.
+  var shuffled = links.sort(() => Math.random() - 0.5);
+  if (callback) callback(shuffled);
+}
 
 function SetInitialOption(key, value) {
   if (localStorage[key] === undefined || localStorage[key] === null) {
@@ -16,23 +90,23 @@ function SetInitialOption(key, value) {
   }
 }
 
-function UpdateIfReady(feedKey, force) {
+function UpdateIfReady(feedKey, force, callback) {
   var lastRefresh = parseFloat(localStorage[feedKey + ".LastRefresh"]);
   var interval = parseFloat(localStorage[feedKey + ".RequestInterval"]);
   var nextRefresh = lastRefresh + interval;
   var curTime = parseFloat((new Date()).getTime());
   var isReady = (curTime > nextRefresh);
   if ((force == true) || isNaN(lastRefresh)) {
-    UpdateFeed(feedKey);
+    UpdateFeed(feedKey, callback);
   }
   else {
     if (isReady) {
-      UpdateFeed(feedKey);
+      UpdateFeed(feedKey, callback);
     }
   }
 }
 
-function UpdateFeed(feedKey) {
+function UpdateFeed(feedKey, callback) {
   var xhr = new XMLHttpRequest();
   var url = FEEDS[feedKey];
   if (!url) return;
@@ -40,7 +114,7 @@ function UpdateFeed(feedKey) {
   xhr.open('GET', url);
   xhr.onload = function () {
     if (xhr.status === 200) {
-      onRssSuccess(feedKey, xhr.responseText);
+      onRssSuccess(feedKey, xhr.responseText, callback);
     }
     else {
       onRssError(feedKey);
@@ -49,14 +123,19 @@ function UpdateFeed(feedKey) {
   xhr.send();
 }
 
-function onRssSuccess(feedKey, doc) {
+function onRssSuccess(feedKey, doc, callback) {
   if (!doc) {
     handleFeedParsingFailed(feedKey, "Not a valid feed.");
     return;
   }
   var links = parseFeedLinks(doc);
   SaveLinksToLocalStorage(feedKey, links);
-  if (buildPopupAfterResponse == true) {
+
+  if (callback) {
+    callback(links);
+  }
+
+  if (buildPopupAfterResponse == true && typeof buildPopup === 'function') {
     buildPopup(links);
     buildPopupAfterResponse = false;
   }
@@ -206,7 +285,7 @@ function hideElement(id) {
 
 function showElement(id) {
   var e = document.getElementById(id);
-  e.style.display = 'block';
+  if (e) e.style.display = 'block';
 }
 
 function toggle(id) {
