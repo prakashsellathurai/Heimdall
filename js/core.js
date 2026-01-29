@@ -1,4 +1,4 @@
-var maxFeedItems = 15;
+var maxFeedItems = 20;
 var req;
 var buildPopupAfterResponse = false;
 var OnFeedSuccess = null;
