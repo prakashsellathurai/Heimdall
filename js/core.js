@@ -301,3 +301,34 @@ function toggle(id) {
   else
     e.style.display = 'block';
 }
+
+if (typeof module !== 'undefined') {
+  module.exports = {
+    LoadFeeds,
+    SaveFeeds,
+    AddFeed,
+    RemoveFeed,
+    GetMixedFeed,
+    finalizeMixedFeed,
+    SetInitialOption,
+    UpdateIfReady,
+    UpdateFeed,
+    onRssSuccess,
+    updateLastRefreshTime,
+    onRssError,
+    handleFeedParsingFailed,
+    parseXml,
+    parseFeedLinks,
+    SaveLinksToLocalStorage,
+    RetrieveLinksFromLocalStorage,
+    openLink,
+    openLinkFront,
+    printTime,
+    openUrl,
+    hideElement,
+    showElement,
+    toggle,
+    DEFAULT_FEEDS,
+    FEEDS
+  };
+}

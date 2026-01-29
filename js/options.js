@@ -108,3 +108,10 @@ function handleAddFeed() {
     nameInput.value = '';
     urlInput.value = '';
 }
+
+if (typeof module !== 'undefined') {
+    module.exports = {
+        renderFeedList,
+        handleAddFeed
+    };
+}

@@ -216,3 +216,20 @@ function handleAddFeedDashboard() {
     renderSettings();
     alert('Feed added successfully!');
 }
+
+if (typeof module !== 'undefined') {
+    module.exports = {
+        initDashboard,
+        setupDashboardEvents,
+        setupPreviewEvents,
+        showView,
+        renderSidebarFeeds,
+        renderArticle,
+        openInPreview,
+        closePreview,
+        renderHomeFeed,
+        renderIndividualFeed,
+        renderSettings,
+        handleAddFeedDashboard
+    };
+}

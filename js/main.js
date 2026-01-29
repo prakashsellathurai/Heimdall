@@ -11,3 +11,9 @@ SetInitialOption("LWN.RequestInterval", 1200000);
 SetInitialOption("HN.BackgroundTabs", false);
 
 startRequest();
+
+if (typeof module !== 'undefined') {
+  module.exports = {
+    startRequest
+  };
+}

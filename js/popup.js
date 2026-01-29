@@ -30,7 +30,7 @@ function renderTabs() {
   var homeBtn = document.createElement("button");
   homeBtn.className = "tab-button" + (currentFeed === "Home" ? " active" : "");
   homeBtn.setAttribute("data-feed", "Home");
-  homeBtn.innerText = "Home";
+  homeBtn.textContent = "Home";
   tabsContainer.appendChild(homeBtn);
 
   for (var key in feeds) {
@@ -38,7 +38,7 @@ function renderTabs() {
       var btn = document.createElement("button");
       btn.className = "tab-button" + (currentFeed === key ? " active" : "");
       btn.setAttribute("data-feed", key);
-      btn.innerText = key;
+      btn.textContent = key;
       tabsContainer.appendChild(btn);
     }
   }
@@ -101,7 +101,7 @@ function buildPopup(links) {
   if (!links || links.length === 0) {
     var row = document.createElement("tr");
     var col = document.createElement("td");
-    col.innerText = "No items found. Try refreshing.";
+    col.textContent = "No items found. Try refreshing.";
     col.className = "error";
     row.appendChild(col);
     feed.appendChild(row);
@@ -115,11 +115,11 @@ function buildPopup(links) {
     var row = document.createElement("tr");
     row.className = "link";
     var num = document.createElement("td");
-    num.innerText = i + 1;
+    num.textContent = i + 1;
     var link_col = document.createElement("td")
     var title = document.createElement("a");
     title.className = "link_title";
-    title.innerText = item.Title;
+    title.textContent = item.Title;
     title.href = item.Link;
     title.addEventListener("click", openLink);
 
@@ -129,7 +129,7 @@ function buildPopup(links) {
     if (item.CommentsLink) {
       var comments = document.createElement("a");
       comments.className = "comments";
-      comments.innerText = "(comments)";
+      comments.textContent = "(comments)";
       comments.href = item.CommentsLink;
       comments.addEventListener("click", openLink);
       link_col.appendChild(comments);
@@ -157,3 +157,13 @@ function refreshLinks() {
 
 
 
+if (typeof module !== 'undefined') {
+  module.exports = {
+    setupEvents,
+    renderTabs,
+    switchTab,
+    main,
+    buildPopup,
+    refreshLinks
+  };
+}
