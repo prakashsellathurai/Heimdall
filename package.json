@@ -8,6 +8,7 @@
         "test:watch": "jest --watch",
         "test:coverage": "jest --coverage",
         "test:e2e": "playwright test",
+        "benchmark": "node benchmarks/core.bench.mjs --expose-gc",
         "build": "node scripts/build.js"
     },
     "devDependencies": {
@@ -15,9 +16,11 @@
         "@playwright/test": "^1.57.0",
         "archiver": "^6.0.1",
         "jest": "^29.7.0",
-        "jest-environment-jsdom": "^29.7.0"
+        "jest-environment-jsdom": "^29.7.0",
+        "jsdom": "^27.4.0"
     },
     "dependencies": {
+        "@mitata/counters": "^0.0.8",
         "mitata": "^1.0.34"
     }
 }
