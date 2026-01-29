@@ -16,5 +16,8 @@
         "archiver": "^6.0.1",
         "jest": "^29.7.0",
         "jest-environment-jsdom": "^29.7.0"
+    },
+    "dependencies": {
+        "mitata": "^1.0.34"
     }
 }
