@@ -9,7 +9,8 @@
         "test:coverage": "bun run jest --coverage",
         "test:e2e": "bun run playwright test",
         "benchmark": "bun run benchmarks/core.bench.mjs --expose-gc",
-        "build": "bun run scripts/build.js"
+        "build": "bun run scripts/build.js",
+        "create-demo-video": "bun run scripts/create-demo-video.js"
     },
     "devDependencies": {
         "@playwright/browser-chromium": "^1.57.0",
