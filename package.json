@@ -4,12 +4,12 @@
     "description": "All-seeing content Curator - Hacker News browser extension",
     "private": true,
     "scripts": {
-        "test": "jest",
-        "test:watch": "jest --watch",
-        "test:coverage": "jest --coverage",
-        "test:e2e": "playwright test",
-        "benchmark": "node benchmarks/core.bench.mjs --expose-gc",
-        "build": "node scripts/build.js"
+        "test": "bun run jest",
+        "test:watch": "bun run jest --watch",
+        "test:coverage": "bun run jest --coverage",
+        "test:e2e": "bun run playwright test",
+        "benchmark": "bun run benchmarks/core.bench.mjs --expose-gc",
+        "build": "bun run scripts/build.js"
     },
     "devDependencies": {
         "@playwright/browser-chromium": "^1.57.0",
