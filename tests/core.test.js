@@ -136,6 +136,16 @@ describe('Core Functions', () => {
             expect(cb).toHaveBeenCalledWith([]);
         });
 
+        it('UpdateFeed calls callback with empty array when URL is missing', () => {
+            // Temporarily remove feeds so FEEDS[feedKey] is undefined
+            const savedFeeds = core.FEEDS;
+            core.FEEDS = {};
+            const cb = jest.fn();
+            core.UpdateFeed('NonExistent', cb);
+            expect(cb).toHaveBeenCalledWith([]);
+            core.FEEDS = savedFeeds;
+        });
+
         it('UpdateFeed handles 404', () => {
             const cb = jest.fn();
             const x = new XMLHttpRequest();
@@ -230,6 +240,60 @@ describe('Core Functions', () => {
             expect(cb).toHaveBeenCalled();
             const result = cb.mock.calls[0][0];
             expect(result.length).toBeGreaterThan(0);
+        });
+
+        it('GetMixedFeed uses FEEDS consistently with UpdateFeed', () => {
+            // Simulate divergence: SaveFeeds sets both FEEDS and localStorage
+            core.SaveFeeds({ 'HN': 'https://news.ycombinator.com/rss' });
+            // Directly override localStorage to have different keys than FEEDS
+            localStorage['Heimdall.Feeds'] = JSON.stringify({ 'OWID': 'https://ourworldindata.org/atom.xml' });
+
+            // Cache links for HN (the key in FEEDS, not in localStorage)
+            core.SaveLinksToLocalStorage('HN', [{ Title: 'HN Item', Link: 'http://hn.com' }]);
+
+            const cb = jest.fn();
+            core.GetMixedFeed(cb);
+
+            // Before fix: GetMixedFeed uses LoadFeeds() -> OWID -> no cache -> UpdateFeed('OWID') -> FEEDS['OWID'] undefined -> callback([]) -> empty
+            // After fix: GetMixedFeed uses FEEDS -> HN -> cached -> shows HN Item
+            expect(cb).toHaveBeenCalled();
+            const result = cb.mock.calls[0][0];
+            expect(result.length).toBeGreaterThan(0);
+            expect(result[0].Title).toBe('HN Item');
+
+            core.SaveFeeds(core.DEFAULT_FEEDS);
+        });
+
+        it('GetMixedFeed has safety timeout if UpdateFeed never calls back', () => {
+            // Setup: one feed cached, one feed uncached with XHR that never responds
+            core.SaveFeeds({ 'HN': 'https://news.ycombinator.com/rss', 'Slow': 'https://slow.example.com/rss' });
+            core.SaveLinksToLocalStorage('HN', [{ Title: 'HN Item', Link: 'http://hn.com' }]);
+
+            // Mock XHR to never fire for Slow feed
+            jest.spyOn(global, 'XMLHttpRequest').mockImplementation(() => {
+                return {
+                    open: function () {},
+                    send: function () {
+                        // Never fire onload/onerror - simulates hanging feed
+                    }
+                };
+            });
+
+            jest.useFakeTimers();
+            const cb = jest.fn();
+            core.GetMixedFeed(cb);
+
+            // Advance past the 10s timeout
+            jest.advanceTimersByTime(10000);
+
+            expect(cb).toHaveBeenCalled();
+            const result = cb.mock.calls[0][0];
+            // Should at least have HN item (from cache)
+            expect(result.length).toBeGreaterThan(0);
+
+            jest.useRealTimers();
+            jest.restoreAllMocks();
+            core.SaveFeeds(core.DEFAULT_FEEDS);
         });
 
         it('GetMixedFeed works with empty feeds', () => {

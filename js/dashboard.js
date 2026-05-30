@@ -16,8 +16,9 @@ function setupDashboardEvents() {
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', function () {
             var view = this.getAttribute('data-view');
+            var feed = this.getAttribute('data-feed');
             if (view) {
-                showView(view);
+                showView(view, feed);
             }
         });
     });
@@ -152,19 +153,28 @@ function renderIndividualFeed(feedKey) {
     var container = document.getElementById('feed-articles');
     var title = document.getElementById('feed-title');
     title.textContent = feedKey;
-    container.innerHTML = 'Loading articles...';
 
-    UpdateFeed(feedKey, function (links) {
+    var cached = RetrieveLinksFromLocalStorage(feedKey);
+    if (cached) {
         container.innerHTML = '';
-        if (!links || links.length === 0) {
-            container.innerHTML = 'No articles found in this feed.';
-            return;
-        }
         var id = 1;
-        links.forEach(link => {
+        cached.forEach(link => {
             container.appendChild(renderArticle(link, id++));
         });
-    });
+    } else {
+        container.innerHTML = 'Loading articles...';
+        UpdateFeed(feedKey, function (links) {
+            container.innerHTML = '';
+            if (!links || links.length === 0) {
+                container.innerHTML = 'No articles found in this feed.';
+                return;
+            }
+            var id = 1;
+            links.forEach(link => {
+                container.appendChild(renderArticle(link, id++));
+            });
+        });
+    }
 }
 
 function renderSettings() {

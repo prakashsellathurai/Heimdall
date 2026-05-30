@@ -47,8 +47,7 @@ function RemoveFeed(name) {
 }
 
 function GetMixedFeed(callback) {
-  var feeds = LoadFeeds();
-  var feedKeys = Object.keys(feeds);
+  var feedKeys = Object.keys(FEEDS);
   var allLinks = [];
   var completed = 0;
 
@@ -57,12 +56,19 @@ function GetMixedFeed(callback) {
     return;
   }
 
+  var fallbackTimer = setTimeout(function () {
+    if (completed < feedKeys.length) {
+      finalizeMixedFeed(allLinks, callback);
+    }
+  }, 10000);
+
   feedKeys.forEach(function (key) {
     var cached = RetrieveLinksFromLocalStorage(key);
     if (cached) {
       allLinks = allLinks.concat(cached.slice(0, 5)); // Take top 5 from each
       completed++;
       if (completed === feedKeys.length) {
+        clearTimeout(fallbackTimer);
         finalizeMixedFeed(allLinks, callback);
       }
     } else {
@@ -70,6 +76,7 @@ function GetMixedFeed(callback) {
         allLinks = allLinks.concat(links.slice(0, 5));
         completed++;
         if (completed === feedKeys.length) {
+          clearTimeout(fallbackTimer);
           finalizeMixedFeed(allLinks, callback);
         }
       });
@@ -109,7 +116,10 @@ function UpdateIfReady(feedKey, force, callback) {
 function UpdateFeed(feedKey, callback) {
   var xhr = new XMLHttpRequest();
   var url = FEEDS[feedKey];
-  if (!url) return;
+  if (!url) {
+    if (callback) callback([]);
+    return;
+  }
 
   xhr.open('GET', url);
   xhr.onload = function () {

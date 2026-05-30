@@ -2,13 +2,19 @@ const { test, expect } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
 
+// Per-test route delay config, set before navigation. Each test runs in its
+// own worker under fullyParallel, so this is naturally isolated.
+const routeDelays = {};
+
 test.describe('Heimdall Extension Simulation', () => {
   test.beforeEach(async ({ page }) => {
+    Object.keys(routeDelays).forEach(k => delete routeDelays[k]);
+
     page.on('console', msg => console.log('PAGE LOG:', msg.text()));
     page.on('pageerror', error => console.log('PAGE ERROR:', error.message));
 
-    // Mock HN RSS feed
     await page.route('https://news.ycombinator.com/rss', async route => {
+      if (routeDelays['hn']) await new Promise(r => setTimeout(r, routeDelays['hn']));
       const hnRss = `<?xml version="1.0" encoding="UTF-8"?>
       <rss version="2.0">
         <channel>
@@ -22,8 +28,8 @@ test.describe('Heimdall Extension Simulation', () => {
       await route.fulfill({ body: hnRss, contentType: 'text/xml' });
     });
 
-    // Mock LWN RSS feed
     await page.route('https://lwn.net/headlines/rss', async route => {
+      if (routeDelays['lwn']) await new Promise(r => setTimeout(r, routeDelays['lwn']));
       const lwnRss = `<?xml version="1.0" encoding="UTF-8"?>
       <rss version="2.0">
         <channel>
@@ -36,8 +42,8 @@ test.describe('Heimdall Extension Simulation', () => {
       await route.fulfill({ body: lwnRss, contentType: 'text/xml' });
     });
 
-    // Mock OWID RSS feed
     await page.route('https://ourworldindata.org/atom.xml', async route => {
+      if (routeDelays['owid']) await new Promise(r => setTimeout(r, routeDelays['owid']));
       const owidRss = `<?xml version="1.0" encoding="UTF-8"?>
       <rss version="2.0">
         <channel>
@@ -114,6 +120,96 @@ test.describe('Heimdall Extension Simulation', () => {
 
       await page.locator('#close-preview-btn').click();
       await expect(previewPanel).not.toHaveClass(/open/);
+    });
+
+    test('should load cached feeds on Home view without re-fetching', async ({ page }) => {
+      // Pre-populate localStorage with cached feed data (simulating popup already fetched)
+      await page.addInitScript(() => {
+        localStorage.setItem('Heimdall.Feeds', JSON.stringify({
+          'HN': 'https://news.ycombinator.com/rss',
+          'LWN': 'https://lwn.net/headlines/rss',
+          'OWID': 'https://ourworldindata.org/atom.xml'
+        }));
+        localStorage.setItem('HN.NumLinks', '1');
+        localStorage.setItem('HN.Link0', JSON.stringify({
+          Title: 'HN Cached Article',
+          Link: 'https://example.com/hn1',
+          CommentsLink: 'https://news.ycombinator.com/item?id=1'
+        }));
+        localStorage.setItem('LWN.NumLinks', '1');
+        localStorage.setItem('LWN.Link0', JSON.stringify({
+          Title: 'LWN Cached Article',
+          Link: 'https://lwn.net/Articles/1/rss'
+        }));
+        localStorage.setItem('OWID.NumLinks', '1');
+        localStorage.setItem('OWID.Link0', JSON.stringify({
+          Title: 'OWID Cached Article',
+          Link: 'https://example.com/owid1'
+        }));
+      });
+
+      const dashboardPath = path.join(__dirname, '../../dashboard.html');
+      await page.goto(`file://${dashboardPath}`);
+
+      // Should show cached items (distinct titles prove no XHR fallback was used)
+      await page.waitForTimeout(500);
+      const homeArticles = await page.locator('#home-articles').innerText();
+      expect(homeArticles).toContain('HN Cached Article');
+      expect(homeArticles).toContain('LWN Cached Article');
+      expect(homeArticles).toContain('OWID Cached Article');
+    });
+
+    test('should navigate to individual feed via sidebar', async ({ page }) => {
+      // Pre-populate with cached feeds so sidebar renders
+      await page.addInitScript(() => {
+        localStorage.setItem('Heimdall.Feeds', JSON.stringify({
+          'HN': 'https://news.ycombinator.com/rss',
+          'LWN': 'https://lwn.net/headlines/rss',
+          'OWID': 'https://ourworldindata.org/atom.xml'
+        }));
+        localStorage.setItem('HN.NumLinks', '2');
+        localStorage.setItem('HN.Link0', JSON.stringify({ Title: 'HN Article 1', Link: 'https://example.com/hn1' }));
+        localStorage.setItem('HN.Link1', JSON.stringify({ Title: 'HN Article 2', Link: 'https://example.com/hn2' }));
+        localStorage.setItem('LWN.NumLinks', '1');
+        localStorage.setItem('LWN.Link0', JSON.stringify({ Title: 'LWN Article 1', Link: 'https://lwn.net/Articles/1/rss' }));
+        localStorage.setItem('OWID.NumLinks', '1');
+        localStorage.setItem('OWID.Link0', JSON.stringify({ Title: 'OWID Article 1', Link: 'https://example.com/owid1' }));
+      });
+
+      const dashboardPath = path.join(__dirname, '../../dashboard.html');
+      await page.goto(`file://${dashboardPath}`);
+      await page.waitForTimeout(500);
+
+      // Click LWN in sidebar
+      await page.locator('.nav-item[data-feed="LWN"]').click();
+
+      // Verify individual feed view is shown
+      await expect(page.locator('#view-feed')).toBeVisible();
+      await expect(page.locator('#feed-title')).toHaveText('LWN');
+      // Should show LWN articles but not HN or OWID
+      await expect(page.locator('#feed-articles')).toContainText('LWN Article 1');
+      await expect(page.locator('#feed-articles')).not.toContainText('HN Article');
+      await expect(page.locator('#feed-articles')).not.toContainText('OWID Article');
+    });
+
+    test('should show loading state then render feeds', async ({ page }) => {
+      // Slow down RSS responses to ensure loading state is visible before feeds populate
+      routeDelays['hn'] = 800;
+      routeDelays['lwn'] = 800;
+      routeDelays['owid'] = 800;
+
+      const dashboardPath = path.join(__dirname, '../../dashboard.html');
+      await page.goto(`file://${dashboardPath}`);
+
+      // Initially should show loading text before XHR completes
+      await expect(page.locator('#home-articles')).toContainText(/Loading/);
+
+      // After delayed feeds load, should show article content
+      await page.waitForTimeout(2000);
+      const homeArticles = page.locator('#home-articles');
+      await expect(homeArticles).toContainText('HN Mock Item 1');
+      await expect(homeArticles).toContainText('LWN Mock Item 1');
+      await expect(homeArticles).toContainText('OWID Mock Item 1');
     });
 
     test('should add a new feed', async ({ page }) => {

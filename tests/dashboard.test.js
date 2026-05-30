@@ -90,6 +90,24 @@ describe('Dashboard Logic', () => {
         expect(global.alert).toHaveBeenCalled();
     });
 
+    it('setupDashboardEvents passes feedKey for feed nav items', () => {
+        // Add a feed nav-item with data-feed (simulating what renderSidebarFeeds creates)
+        const feedNav = document.createElement('div');
+        feedNav.className = 'nav-item';
+        feedNav.setAttribute('data-view', 'feed');
+        feedNav.setAttribute('data-feed', 'Feed1');
+        feedNav.textContent = 'Feed1';
+        document.body.appendChild(feedNav);
+
+        dashboard.setupDashboardEvents();
+        feedNav.click();
+
+        // If feedKey is passed, view-feed shows and feed renders with Feed1
+        expect(document.getElementById('view-feed').style.display).toBe('block');
+        expect(document.getElementById('feed-title').textContent).toBe('Feed1');
+        expect(global.UpdateFeed).toHaveBeenCalledWith('Feed1', expect.any(Function));
+    });
+
     it('showView switches views', () => {
         dashboard.showView('settings');
         expect(document.getElementById('view-home').style.display).toBe('none');
