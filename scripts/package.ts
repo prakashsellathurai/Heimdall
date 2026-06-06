@@ -6,6 +6,7 @@ import { ZipArchive } from 'archiver';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, '..');
 const distDir = join(rootDir, 'dist');
+const publishDir = join(rootDir, 'publish');
 
 interface Manifest {
   background?: {
@@ -16,10 +17,14 @@ interface Manifest {
 }
 
 async function createPackage(target: 'chrome' | 'firefox'): Promise<void> {
-  const zipPath = join(distDir, `heimdall-${target}.zip`);
+  const zipPath = join(publishDir, `heimdall-${target}.zip`);
 
   if (!existsSync(distDir)) {
     mkdirSync(distDir, { recursive: true });
+  }
+
+  if (!existsSync(publishDir)) {
+    mkdirSync(publishDir, { recursive: true });
   }
 
   if (existsSync(zipPath)) {
@@ -32,7 +37,7 @@ async function createPackage(target: 'chrome' | 'firefox'): Promise<void> {
   return new Promise((resolve, reject) => {
     output.on('close', () => {
       const sizeKB = (archive.pointer() / 1024).toFixed(2);
-      console.log(`  ✓ Created: dist/heimdall-${target}.zip (${sizeKB} KB)`);
+      console.log(`  ✓ Created: publish/heimdall-${target}.zip (${sizeKB} KB)`);
       resolve();
     });
 
