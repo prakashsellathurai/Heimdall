@@ -1,0 +1,78 @@
+name: Release
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'public/manifest.json'
+      - 'package.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build, tag & release
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Read current version
+        id: current
+        run: |
+          VERSION=$(jq -r '.version' public/manifest.json)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Current version: $VERSION"
+
+      - name: Check if release tag already exists
+        id: check
+        run: |
+          TAG="v${{ steps.current.outputs.version }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Tag $TAG already exists; release skipped."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "Tag $TAG does not exist; will build and release."
+          fi
+
+      - name: Build extension
+        if: steps.check.outputs.exists == 'false'
+        run: bun run build
+
+      - name: Create and push git tag
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "v${{ steps.current.outputs.version }}"
+          git push origin "v${{ steps.current.outputs.version }}"
+
+      - name: Create GitHub release with zips
+        if: steps.check.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.current.outputs.version }}
+          name: v${{ steps.current.outputs.version }}
+          generate_release_notes: true
+          files: |
+            publish/heimdall-chrome.zip
+            publish/heimdall-firefox.zip
+          fail_on_unmatched_files: true
