@@ -45,4 +45,4 @@ Object.assign(globalThis, {
   XMLHttpRequest: MockXMLHttpRequest as unknown as typeof XMLHttpRequest,
 });
 
-export { tabCreateMock, openOptionsPageMock, MockXMLHttpRequest };
+export { MockXMLHttpRequest, openOptionsPageMock, tabCreateMock };

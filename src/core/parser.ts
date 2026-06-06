@@ -1,21 +1,12 @@
-import { FeedItem, MAX_FEED_ITEMS } from '../types';
+import { type FeedItem, MAX_FEED_ITEMS } from '../types';
 
-function getTextContent(
-  element: Element,
-  tagName: string,
-  index = 0
-): string | null {
+function getTextContent(element: Element, tagName: string, index = 0): string | null {
   const tags = element.getElementsByTagName(tagName);
   const tag = tags[index];
   return tag?.textContent ?? null;
 }
 
-function getAttribute(
-  element: Element,
-  tagName: string,
-  attr: string,
-  index = 0
-): string | null {
+function getAttribute(element: Element, tagName: string, attr: string, index = 0): string | null {
   const tags = element.getElementsByTagName(tagName);
   const tag = tags[index];
   return tag?.getAttribute(attr) ?? null;

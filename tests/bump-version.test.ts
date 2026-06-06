@@ -1,14 +1,14 @@
 import './setup';
-import { mkdtempSync, writeFileSync, readFileSync, rmSync } from 'fs';
-import { tmpdir } from 'os';
-import { join } from 'path';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
   bumpSemver,
-  isGreaterVersion,
-  parseSemver,
   detectIndent,
-  setVersionInFile,
+  isGreaterVersion,
   parseArgs,
+  parseSemver,
+  setVersionInFile,
 } from '../scripts/bump-version';
 
 describe('parseSemver', () => {
@@ -104,8 +104,7 @@ describe('setVersionInFile', () => {
   });
 
   it('updates the top-level version preserving 2-space indent', () => {
-    const before =
-      '{\n  "manifest_version": 3,\n  "name": "heimdall",\n  "version": "1.2.0"\n}\n';
+    const before = '{\n  "manifest_version": 3,\n  "name": "heimdall",\n  "version": "1.2.0"\n}\n';
     writeFileSync(file, before);
     setVersionInFile(file, '1.2.0', '1.2.1');
     const after = readFileSync(file, 'utf-8');
@@ -115,8 +114,7 @@ describe('setVersionInFile', () => {
   });
 
   it('updates the top-level version preserving 4-space indent', () => {
-    const before =
-      '{\n    "name": "heimdall",\n    "version": "1.2.0"\n}\n';
+    const before = '{\n    "name": "heimdall",\n    "version": "1.2.0"\n}\n';
     writeFileSync(file, before);
     setVersionInFile(file, '1.2.0', '2.0.0');
     const after = readFileSync(file, 'utf-8');

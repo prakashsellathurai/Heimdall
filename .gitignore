@@ -5,3 +5,4 @@ _metadata/*
 test-results/
 !demo/heimdall-demo.webm
 demo/*
+.biome/

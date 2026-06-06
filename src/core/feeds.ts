@@ -1,6 +1,6 @@
-import { FeedItem, RETRY_MS, MIXED_FEED_TIMEOUT } from '../types';
-import { getFeeds, getFeedLinks, saveFeedLinks, getLastRefresh, setLastRefresh } from './storage';
+import { type FeedItem, MIXED_FEED_TIMEOUT, RETRY_MS } from '../types';
 import { parseFeedLinks } from './parser';
+import { getFeedLinks, getFeeds, getLastRefresh, saveFeedLinks, setLastRefresh } from './storage';
 
 let _onFeedUpdate: ((key: string, items: FeedItem[]) => void) | null = null;
 
@@ -63,7 +63,7 @@ export function getMixedFeed(callback: (links: FeedItem[]) => void): void {
 export function updateIfReady(
   feedKey: string,
   force?: boolean,
-  callback?: (links: FeedItem[]) => void
+  callback?: (links: FeedItem[]) => void,
 ): void {
   const lastRefresh = getLastRefresh(feedKey);
   const interval = RETRY_MS;
@@ -71,17 +71,14 @@ export function updateIfReady(
   const curTime = Date.now();
   const isReady = curTime > nextRefresh;
 
-  if (force || isNaN(lastRefresh)) {
+  if (force || Number.isNaN(lastRefresh)) {
     updateFeed(feedKey, callback);
   } else if (isReady) {
     updateFeed(feedKey, callback);
   }
 }
 
-export function updateFeed(
-  feedKey: string,
-  callback?: (links: FeedItem[]) => void
-): void {
+export function updateFeed(feedKey: string, callback?: (links: FeedItem[]) => void): void {
   const feeds = getFeeds();
   const url = feeds[feedKey];
 
@@ -108,11 +105,7 @@ export function updateFeed(
   xhr.send();
 }
 
-function onRssSuccess(
-  feedKey: string,
-  doc: string,
-  callback?: (links: FeedItem[]) => void
-): void {
+function onRssSuccess(feedKey: string, doc: string, callback?: (links: FeedItem[]) => void): void {
   if (!doc) {
     handleFeedParsingFailed(feedKey);
     return;
@@ -132,10 +125,7 @@ function handleFeedParsingFailed(feedKey: string): void {
   setLastRefresh(feedKey, lastRefresh + RETRY_MS);
 }
 
-function onRssError(
-  feedKey: string,
-  callback?: (links: FeedItem[]) => void
-): void {
+function onRssError(feedKey: string, callback?: (links: FeedItem[]) => void): void {
   handleFeedParsingFailed(feedKey);
   callback?.([]);
 }

@@ -1,4 +1,10 @@
-import { FeedItem, Feeds, STORAGE_KEYS, DEFAULT_FEEDS, DEFAULT_REQUEST_INTERVAL } from '../types';
+import {
+  DEFAULT_FEEDS,
+  DEFAULT_REQUEST_INTERVAL,
+  type FeedItem,
+  type Feeds,
+  STORAGE_KEYS,
+} from '../types';
 
 let feedsCache: Feeds | null = null;
 

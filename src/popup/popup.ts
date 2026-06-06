@@ -1,7 +1,7 @@
-import { FeedItem, STORAGE_KEYS } from '../types';
-import { getFeeds, getFeedLinks } from '../core/storage';
-import { getMixedFeed, updateFeed, setOnFeedUpdate, triggerFeedUpdate } from '../core/feeds';
-import { openUrl, openOptionsPage } from '../core/browser';
+import { openOptionsPage, openUrl } from '../core/browser';
+import { getMixedFeed, setOnFeedUpdate, triggerFeedUpdate, updateFeed } from '../core/feeds';
+import { getFeedLinks, getFeeds } from '../core/storage';
+import { type FeedItem, STORAGE_KEYS } from '../types';
 
 let currentFeed: string = localStorage.getItem(STORAGE_KEYS.LAST_POPUP_FEED) || 'Home';
 
@@ -18,7 +18,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setupEvents();
 });
 
-export { renderTabs, switchTab, main, buildPopup, refreshLinks, setupEvents };
+export { buildPopup, main, refreshLinks, renderTabs, setupEvents, switchTab };
 
 function setupEvents(): void {
   const refreshBtn = document.getElementById('refresh');
@@ -48,15 +48,15 @@ function renderTabs(): void {
   tabsContainer.innerHTML = '';
 
   const homeBtn = document.createElement('button');
-  homeBtn.className = 'tab-button' + (currentFeed === 'Home' ? ' active' : '');
+  homeBtn.className = `tab-button${currentFeed === 'Home' ? ' active' : ''}`;
   homeBtn.setAttribute('data-feed', 'Home');
   homeBtn.textContent = 'Home';
   tabsContainer.appendChild(homeBtn);
 
   for (const key in feeds) {
-    if (Object.prototype.hasOwnProperty.call(feeds, key)) {
+    if (Object.hasOwn(feeds, key)) {
       const btn = document.createElement('button');
-      btn.className = 'tab-button' + (currentFeed === key ? ' active' : '');
+      btn.className = `tab-button${currentFeed === key ? ' active' : ''}`;
       btn.setAttribute('data-feed', key);
       btn.textContent = key;
       tabsContainer.appendChild(btn);

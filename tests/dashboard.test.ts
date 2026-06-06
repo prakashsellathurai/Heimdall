@@ -29,7 +29,10 @@ describe('Dashboard Logic', () => {
   });
 
   it('renderSidebarFeeds renders feed list', async () => {
-    localStorage.setItem('Heimdall.Feeds', JSON.stringify({ F1: 'http://f1.com', F2: 'http://f2.com' }));
+    localStorage.setItem(
+      'Heimdall.Feeds',
+      JSON.stringify({ F1: 'http://f1.com', F2: 'http://f2.com' }),
+    );
     const { clearFeedsCache } = await import('../src/core/storage');
     clearFeedsCache();
 
@@ -82,7 +85,10 @@ describe('Dashboard Logic', () => {
   });
 
   it('renderSettings shows feeds with unsubscribe buttons', async () => {
-    localStorage.setItem('Heimdall.Feeds', JSON.stringify({ F1: 'http://f1.com', F2: 'http://f2.com' }));
+    localStorage.setItem(
+      'Heimdall.Feeds',
+      JSON.stringify({ F1: 'http://f1.com', F2: 'http://f2.com' }),
+    );
     const { clearFeedsCache } = await import('../src/core/storage');
     clearFeedsCache();
 

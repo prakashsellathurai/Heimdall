@@ -37,7 +37,10 @@ describe('Popup Logic', () => {
   });
 
   it('renderTabs renders Home and feed tabs', async () => {
-    localStorage.setItem('Heimdall.Feeds', JSON.stringify({ HN: 'http://hn.com', LWN: 'http://lwn.com' }));
+    localStorage.setItem(
+      'Heimdall.Feeds',
+      JSON.stringify({ HN: 'http://hn.com', LWN: 'http://lwn.com' }),
+    );
     const { clearFeedsCache } = await import('../src/core/storage');
     clearFeedsCache();
 
