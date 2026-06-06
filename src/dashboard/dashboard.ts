@@ -1,6 +1,6 @@
-import { getMixedFeed, updateFeed } from '../core/feeds';
-import { addFeed, getFeedLinks, getFeeds, removeFeed } from '../core/storage';
-import { type FeedItem, STORAGE_KEYS } from '../types';
+import { getMixedFeed, updateFeed } from "../core/feeds";
+import { addFeed, getFeedLinks, getFeeds, removeFeed } from "../core/storage";
+import { type FeedItem, STORAGE_KEYS } from "../types";
 
 function showToast(message: string): void {
   const existing = document.getElementById("heimdall-toast");
@@ -13,7 +13,7 @@ function showToast(message: string): void {
     "position:fixed;bottom:20px;right:20px;background:#333;color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;z-index:9999;opacity:0;transition:opacity 0.2s;box-shadow:0 2px 8px rgba(0,0,0,0.3)";
   document.body.appendChild(toast);
   requestAnimationFrame(() => {
-    toast.style.opacity = '1';
+    toast.style.opacity = "1";
   });
   setTimeout(() => {
     toast.style.opacity = "0";
@@ -75,7 +75,7 @@ function showView(viewId: string, feedKey?: string | null): void {
   if (settingsView) settingsView.style.display = "none";
 
   const target = document.getElementById(`view-${viewId}`);
-  if (target) target.style.display = 'block';
+  if (target) target.style.display = "block";
 
   if (viewId === "home") {
     renderHomeFeed();
@@ -94,10 +94,10 @@ function renderSidebarFeeds(): void {
 
   for (const key in feeds) {
     if (Object.hasOwn(feeds, key)) {
-      const item = document.createElement('div');
-      item.className = 'nav-item';
-      item.setAttribute('data-view', 'feed');
-      item.setAttribute('data-feed', key);
+      const item = document.createElement("div");
+      item.className = "nav-item";
+      item.setAttribute("data-view", "feed");
+      item.setAttribute("data-feed", key);
       item.textContent = key;
       item.addEventListener("click", () => showView("feed", key));
       container.appendChild(item);
@@ -113,7 +113,7 @@ function renderArticle(item: FeedItem, id: number): HTMLDivElement {
   title.className = "article-title";
   title.href = item.Link;
   title.textContent = `${id}. ${item.Title}`;
-  title.addEventListener('click', (e) => {
+  title.addEventListener("click", (e) => {
     e.preventDefault();
     openInPreview(item.Link);
   });
@@ -213,8 +213,8 @@ function renderSettings(): void {
 
   for (const key in feeds) {
     if (Object.hasOwn(feeds, key)) {
-      const item = document.createElement('div');
-      item.className = 'feed-management-item';
+      const item = document.createElement("div");
+      item.className = "feed-management-item";
 
       const info = document.createElement("div");
       const nameSpan = document.createElement("strong");

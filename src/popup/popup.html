@@ -1,41 +1,39 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-  <script type="module" src="./popup.ts"></script>
-  <link href="../css/style.css" rel="stylesheet" type="text/css" />
+  <head>
+    <script type="module" src="./popup.ts"></script>
+    <link href="../css/style.css" rel="stylesheet" type="text/css" />
     <style>
-    body {
-      overflow: hidden;
-    }
+      body {
+        overflow: hidden;
+      }
 
-    #container,
-    #spinner {
-      width: 350px;
-    }
-  </style>
-</head>
+      #container,
+      #spinner {
+        width: 350px;
+      }
+    </style>
+  </head>
 
-<body style="overflow: hidden;">
-  <div id="spinner" style="display:none">
-    <img src="../images/Hourglass.gif" alt="Loading">
-  </div>
-  <div id="container" class="popup-container">
-    <div id="tabs">
+  <body style="overflow: hidden">
+    <div id="spinner" style="display: none">
+      <img src="../images/Hourglass.gif" alt="Loading" />
     </div>
+    <div id="container" class="popup-container">
+      <div id="tabs"></div>
 
-    <table id="feed" cellspacing="3" cellpadding="0">
-    </table>
+      <table id="feed" cellspacing="3" cellpadding="0"></table>
 
-    <div id="footer">
-      <div class="right">
-        <a href="" id="refresh">Refresh</a> | <a href="" id="open-options">Dashboard</a> | <a
-          href="https://github.com/prakashsellathuria/Heimdall/">submit an
-          issue</a>
+      <div id="footer">
+        <div class="right">
+          <a href="" id="refresh">Refresh</a> |
+          <a href="" id="open-options">Dashboard</a> |
+          <a href="https://github.com/prakashsellathuria/Heimdall/"
+            >submit an issue</a
+          >
+        </div>
+        <div style="clear: both"></div>
       </div>
-      <div style="clear:both"></div>
     </div>
-  </div>
-</body>
-
+  </body>
 </html>

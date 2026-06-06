@@ -4,7 +4,7 @@ import {
   type FeedItem,
   type Feeds,
   STORAGE_KEYS,
-} from '../types';
+} from "../types";
 
 let feedsCache: Feeds | null = null;
 
@@ -21,7 +21,7 @@ export function getFeeds(): Feeds {
       feedsCache = JSON.parse(stored) as Feeds;
       return feedsCache;
     } catch {
-      console.error('Failed to parse stored feeds');
+      console.error("Failed to parse stored feeds");
     }
   }
 

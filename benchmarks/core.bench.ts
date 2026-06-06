@@ -1,14 +1,14 @@
-import { JSDOM } from 'jsdom';
-import { bench, group, run } from 'mitata';
-import { parseFeedLinks } from '../src/core/parser';
+import { JSDOM } from "jsdom";
+import { bench, group, run } from "mitata";
+import { parseFeedLinks } from "../src/core/parser";
 
-const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>', {
-  url: 'http://localhost/',
+const dom = new JSDOM("<!DOCTYPE html><html><body></body></html>", {
+  url: "http://localhost/",
 });
 globalThis.DOMParser = dom.window.DOMParser;
 
 function generateXML(itemCount: number): string {
-  let items = '';
+  let items = "";
   for (let i = 0; i < itemCount; i++) {
     items += `
         <item>
@@ -35,20 +35,20 @@ const mediumXML = generateXML(20);
 const largeXML = generateXML(100);
 const extraLargeXML = generateXML(1000);
 
-group('Feed Parsing', () => {
-  bench('Small Feed (5 items) [Baseline]', () => {
+group("Feed Parsing", () => {
+  bench("Small Feed (5 items) [Baseline]", () => {
     parseFeedLinks(smallXML);
   });
 
-  bench('Medium Feed (20 items)', () => {
+  bench("Medium Feed (20 items)", () => {
     parseFeedLinks(mediumXML);
   });
 
-  bench('Large Feed (100 items)', () => {
+  bench("Large Feed (100 items)", () => {
     parseFeedLinks(largeXML);
   });
 
-  bench('Extra Large Feed (1000 items)', () => {
+  bench("Extra Large Feed (1000 items)", () => {
     parseFeedLinks(extraLargeXML);
   });
 });
