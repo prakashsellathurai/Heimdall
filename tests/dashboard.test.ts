@@ -29,7 +29,10 @@ describe('Dashboard Logic', () => {
   });
 
   it('renderSidebarFeeds renders feed list', async () => {
-    localStorage.setItem('Heimdall.Feeds', JSON.stringify({ F1: 'http://f1.com', F2: 'http://f2.com' }));
+    localStorage.setItem(
+      'Heimdall.Feeds',
+      JSON.stringify({ F1: 'http://f1.com', F2: 'http://f2.com' }),
+    );
     const { clearFeedsCache } = await import('../src/core/storage');
     clearFeedsCache();
 
@@ -51,7 +54,11 @@ describe('Dashboard Logic', () => {
 
   it('renderArticle creates card with preview on click', async () => {
     const { renderArticle } = await import('../src/dashboard/dashboard');
-    const item = { Title: 'T', Link: 'http://t.com', CommentsLink: 'http://c.com' };
+    const item = {
+      Title: 'T',
+      Link: 'http://t.com',
+      CommentsLink: 'http://c.com',
+    };
     const card = renderArticle(item, 1);
 
     expect(card.className).toBe('article-card');
@@ -82,7 +89,10 @@ describe('Dashboard Logic', () => {
   });
 
   it('renderSettings shows feeds with unsubscribe buttons', async () => {
-    localStorage.setItem('Heimdall.Feeds', JSON.stringify({ F1: 'http://f1.com', F2: 'http://f2.com' }));
+    localStorage.setItem(
+      'Heimdall.Feeds',
+      JSON.stringify({ F1: 'http://f1.com', F2: 'http://f2.com' }),
+    );
     const { clearFeedsCache } = await import('../src/core/storage');
     clearFeedsCache();
 

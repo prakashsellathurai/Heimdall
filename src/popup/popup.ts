@@ -1,22 +1,9 @@
-import { FeedItem, STORAGE_KEYS } from '../types';
-import { getFeeds, getFeedLinks } from '../core/storage';
-import { getMixedFeed, updateFeed, setOnFeedUpdate, triggerFeedUpdate } from '../core/feeds';
-import { openUrl, openOptionsPage } from '../core/browser';
+import { openOptionsPage, openUrl } from '../core/browser';
+import { getMixedFeed, setOnFeedUpdate, triggerFeedUpdate, updateFeed } from '../core/feeds';
+import { getFeedLinks, getFeeds } from '../core/storage';
+import { type FeedItem, STORAGE_KEYS } from '../types';
 
 let currentFeed: string = localStorage.getItem(STORAGE_KEYS.LAST_POPUP_FEED) || 'Home';
-
-function showToast(message: string): void {
-  const toast = document.createElement('div');
-  toast.textContent = message;
-  toast.style.cssText =
-    'position:fixed;bottom:8px;left:8px;right:8px;background:#333;color:#fff;padding:8px 12px;border-radius:6px;font-size:13px;z-index:999;text-align:center;opacity:0;transition:opacity 0.2s';
-  document.body.appendChild(toast);
-  requestAnimationFrame(() => { toast.style.opacity = '1'; });
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    setTimeout(() => toast.remove(), 200);
-  }, 2000);
-}
 
 setOnFeedUpdate((key: string) => {
   if (key === currentFeed) {
@@ -31,7 +18,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setupEvents();
 });
 
-export { renderTabs, switchTab, main, buildPopup, refreshLinks, setupEvents };
+export { buildPopup, main, refreshLinks, renderTabs, setupEvents, switchTab };
 
 function setupEvents(): void {
   const refreshBtn = document.getElementById('refresh');
@@ -61,15 +48,15 @@ function renderTabs(): void {
   tabsContainer.innerHTML = '';
 
   const homeBtn = document.createElement('button');
-  homeBtn.className = 'tab-button' + (currentFeed === 'Home' ? ' active' : '');
+  homeBtn.className = `tab-button${currentFeed === 'Home' ? ' active' : ''}`;
   homeBtn.setAttribute('data-feed', 'Home');
   homeBtn.textContent = 'Home';
   tabsContainer.appendChild(homeBtn);
 
   for (const key in feeds) {
-    if (Object.prototype.hasOwnProperty.call(feeds, key)) {
+    if (Object.hasOwn(feeds, key)) {
       const btn = document.createElement('button');
-      btn.className = 'tab-button' + (currentFeed === key ? ' active' : '');
+      btn.className = `tab-button${currentFeed === key ? ' active' : ''}`;
       btn.setAttribute('data-feed', key);
       btn.textContent = key;
       tabsContainer.appendChild(btn);
@@ -121,7 +108,7 @@ function buildPopup(links: FeedItem[] | null): void {
   const feed = document.getElementById('feed');
   if (!feed) return;
 
-  while (feed.hasChildNodes()) feed.removeChild(feed.firstChild!);
+  while (feed.firstChild) feed.removeChild(feed.firstChild);
 
   if (!links || links.length === 0) {
     const row = document.createElement('tr');
@@ -180,7 +167,7 @@ function buildPopup(links: FeedItem[] | null): void {
 function refreshLinks(): void {
   const feed = document.getElementById('feed');
   if (feed) {
-    while (feed.hasChildNodes()) feed.removeChild(feed.firstChild!);
+    while (feed.firstChild) feed.removeChild(feed.firstChild);
   }
 
   hideElement('container');

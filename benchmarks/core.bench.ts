@@ -1,5 +1,5 @@
-import { run, bench, group } from 'mitata';
 import { JSDOM } from 'jsdom';
+import { bench, group, run } from 'mitata';
 import { parseFeedLinks } from '../src/core/parser';
 
 const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>', {

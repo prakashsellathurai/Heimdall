@@ -1,6 +1,14 @@
-import { readFileSync, existsSync, mkdirSync, unlinkSync, readdirSync, statSync, createWriteStream } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import {
+  createWriteStream,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+  unlinkSync,
+} from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { ZipArchive } from 'archiver';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -62,7 +70,9 @@ async function createPackage(target: 'chrome' | 'firefox'): Promise<void> {
         }
       }
 
-      archive.append(JSON.stringify(manifest, null, 2), { name: 'manifest.json' });
+      archive.append(JSON.stringify(manifest, null, 2), {
+        name: 'manifest.json',
+      });
     }
 
     const items = readdirSync(distDir);

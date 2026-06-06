@@ -1,6 +1,6 @@
-import { readFileSync, writeFileSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = join(__dirname, '..');
@@ -74,18 +74,11 @@ function escapeJsonString(s: string): string {
   return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
-export function setVersionInFile(
-  filePath: string,
-  oldVersion: string,
-  newVersion: string,
-): void {
+export function setVersionInFile(filePath: string, oldVersion: string, newVersion: string): void {
   const raw = readFileSync(filePath, 'utf-8');
   const indent = detectIndent(raw);
   const escapedOld = escapeRegExp(escapeJsonString(oldVersion));
-  const topLevelPattern = new RegExp(
-    `^( {${indent}}|\\t)"version"\\s*:\\s*"${escapedOld}"`,
-    'm',
-  );
+  const topLevelPattern = new RegExp(`^( {${indent}}|\\t)"version"\\s*:\\s*"${escapedOld}"`, 'm');
   if (!topLevelPattern.test(raw)) {
     throw new Error(
       `Could not find top-level "version": "${oldVersion}" in ${filePath}. ` +
@@ -192,12 +185,15 @@ async function main(): Promise<void> {
   }
   console.log('  ✓ Versions match');
 
-  const nextVersion = args.version ?? bumpSemver(manifestVersion, args.bumpType!);
+  if (!args.version && !args.bumpType) {
+    console.error('\n✗ Either an explicit version or --bump-type is required.');
+    process.exit(1);
+  }
+
+  const nextVersion = args.version ?? bumpSemver(manifestVersion, args.bumpType as BumpType);
 
   if (!isGreaterVersion(nextVersion, manifestVersion)) {
-    console.error(
-      `\n✗ New version ${nextVersion} is not greater than current ${manifestVersion}.`,
-    );
+    console.error(`\n✗ New version ${nextVersion} is not greater than current ${manifestVersion}.`);
     process.exit(1);
   }
 

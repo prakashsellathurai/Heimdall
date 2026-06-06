@@ -59,12 +59,15 @@ describe('parseFeedLinks', () => {
   });
 
   it('limits to MAX_FEED_ITEMS', () => {
-    const items = Array.from({ length: 25 }, (_, i) => `
+    const items = Array.from(
+      { length: 25 },
+      (_, i) => `
       <item>
         <title>Item ${i}</title>
         <link>http://item${i}.com</link>
       </item>
-    `).join('\n');
+    `,
+    ).join('\n');
     const xml = `<rss><channel>${items}</channel></rss>`;
     const links = parseFeedLinks(xml);
     expect(links.length).toBe(20);

@@ -1,8 +1,8 @@
-import { chromium, Browser, BrowserContext, Page } from 'playwright';
-import path from 'path';
-import fs from 'fs';
-import { spawn, ChildProcess } from 'child_process';
-import http from 'http';
+import { type ChildProcess, spawn } from 'node:child_process';
+import fs from 'node:fs';
+import http from 'node:http';
+import path from 'node:path';
+import { type Browser, type BrowserContext, chromium, type Page } from 'playwright';
 
 const OUTPUT_VIDEO = process.env.OUTPUT_VIDEO || 'demo/heimdall-demo.webm';
 const DEMO_DIR = path.dirname(OUTPUT_VIDEO);
@@ -11,7 +11,7 @@ const PROJECT_ROOT = path.resolve(__dirname, '..');
 const PREVIEW_PORT = 4173;
 const PREVIEW_URL = `http://localhost:${PREVIEW_PORT}`;
 
-async function waitForServer(url: string, timeoutMs: number = 10000): Promise<void> {
+async function waitForServer(url: string, timeoutMs = 10000): Promise<void> {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
     try {
@@ -26,7 +26,7 @@ async function waitForServer(url: string, timeoutMs: number = 10000): Promise<vo
       });
       return;
     } catch {
-      await new Promise(r => setTimeout(r, 200));
+      await new Promise((r) => setTimeout(r, 200));
     }
   }
   throw new Error(`Server at ${url} did not become ready within ${timeoutMs}ms`);
@@ -141,7 +141,7 @@ async function recordDemo(): Promise<void> {
   await sleep(page, 1500);
 
   // Auto-accept all dialogs (alert/confirm) from here on
-  page.on('dialog', dialog => dialog.accept());
+  page.on('dialog', (dialog) => dialog.accept());
 
   // ---- SCENE 9: Add a new feed ----
   console.log('[9/11] Adding a new feed...');
@@ -165,16 +165,16 @@ async function recordDemo(): Promise<void> {
   server.kill();
 
   // Rename the auto-named video to the desired output path
-  const files = fs.readdirSync(DEMO_DIR).filter(f => f.endsWith('.webm'));
+  const files = fs.readdirSync(DEMO_DIR).filter((f) => f.endsWith('.webm'));
   if (files.length > 0) {
     const src = path.join(DEMO_DIR, files[0]);
     fs.renameSync(src, OUTPUT_VIDEO);
   }
 
-  console.log('Demo video saved to ' + OUTPUT_VIDEO);
+  console.log(`Demo video saved to ${OUTPUT_VIDEO}`);
 }
 
-recordDemo().catch(err => {
+recordDemo().catch((err) => {
   console.error('Demo recording failed:', err);
   process.exit(1);
 });

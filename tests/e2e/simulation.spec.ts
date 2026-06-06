@@ -1,4 +1,4 @@
-import { test, expect, Page, Route } from '@playwright/test';
+import { expect, type Page, type Route, test } from '@playwright/test';
 
 const routeDelays: Record<string, number | undefined> = {};
 let abortMocking = false;
@@ -8,19 +8,19 @@ async function setUpMockRoutes(page: Page) {
     if (abortMocking) return route.abort();
     const url = route.request().url();
     if (url.includes('news.ycombinator.com/rss')) {
-      if (routeDelays['hn']) await new Promise(r => setTimeout(r, routeDelays['hn']));
+      if (routeDelays.hn) await new Promise((r) => setTimeout(r, routeDelays.hn));
       await route.fulfill({
         body: `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><item><title>HN Mock Item 1</title><link>https://example.com/hn1</link><comments>https://news.ycombinator.com/item?id=1</comments></item></channel></rss>`,
         contentType: 'text/xml',
       });
     } else if (url.includes('lwn.net/headlines/rss')) {
-      if (routeDelays['lwn']) await new Promise(r => setTimeout(r, routeDelays['lwn']));
+      if (routeDelays.lwn) await new Promise((r) => setTimeout(r, routeDelays.lwn));
       await route.fulfill({
         body: `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><item><title>LWN Mock Item 1</title><link>https://lwn.net/Articles/1/rss</link></item></channel></rss>`,
         contentType: 'text/xml',
       });
     } else if (url.includes('ourworldindata.org/atom.xml')) {
-      if (routeDelays['owid']) await new Promise(r => setTimeout(r, routeDelays['owid']));
+      if (routeDelays.owid) await new Promise((r) => setTimeout(r, routeDelays.owid));
       await route.fulfill({
         body: `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><item><title>OWID Mock Item 1</title><link>https://example.com/owid1</link></item></channel></rss>`,
         contentType: 'text/xml',
@@ -40,9 +40,9 @@ test.describe('Heimdall Extension - Chrome', () => {
 
   test.beforeEach(async ({ page }) => {
     abortMocking = false;
-    Object.keys(routeDelays).forEach(k => delete routeDelays[k]);
-    page.on('console', msg => console.log('PAGE LOG:', msg.text()));
-    page.on('pageerror', error => console.log('PAGE ERROR:', error.message));
+    for (const k of Object.keys(routeDelays)) delete routeDelays[k];
+    page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
+    page.on('pageerror', (error) => console.log('PAGE ERROR:', error.message));
     await setUpMockRoutes(page);
   });
 
@@ -89,7 +89,10 @@ test.describe('Heimdall Extension - Chrome', () => {
       await page.waitForTimeout(2000);
       await page.locator('text=HN Mock Item 1').click();
       await expect(page.locator('#preview-panel')).toHaveClass(/open/);
-      await expect(page.locator('#preview-frame')).toHaveAttribute('src', 'https://example.com/hn1');
+      await expect(page.locator('#preview-frame')).toHaveAttribute(
+        'src',
+        'https://example.com/hn1',
+      );
       await page.locator('#close-preview-btn').click();
       await expect(page.locator('#preview-panel')).not.toHaveClass(/open/);
     });
@@ -109,11 +112,14 @@ test.describe('Heimdall Extension - Chrome', () => {
 
     test('should navigate to individual feed via sidebar', async ({ page }) => {
       await page.addInitScript(() => {
-        localStorage.setItem('Heimdall.Feeds', JSON.stringify({
-          HN: 'https://news.ycombinator.com/rss',
-          LWN: 'https://lwn.net/headlines/rss',
-          OWID: 'https://ourworldindata.org/atom.xml',
-        }));
+        localStorage.setItem(
+          'Heimdall.Feeds',
+          JSON.stringify({
+            HN: 'https://news.ycombinator.com/rss',
+            LWN: 'https://lwn.net/headlines/rss',
+            OWID: 'https://ourworldindata.org/atom.xml',
+          }),
+        );
       });
       await page.goto('/dashboard/dashboard.html');
       await page.waitForTimeout(2000);
@@ -126,9 +132,9 @@ test.describe('Heimdall Extension - Chrome', () => {
     });
 
     test('should show loading state then render feeds', async ({ page }) => {
-      routeDelays['hn'] = 3000;
-      routeDelays['lwn'] = 3000;
-      routeDelays['owid'] = 3000;
+      routeDelays.hn = 3000;
+      routeDelays.lwn = 3000;
+      routeDelays.owid = 3000;
       await page.goto('/dashboard/dashboard.html');
       await expect(page.locator('#home-articles')).toContainText(/Loading/);
       await page.waitForTimeout(4000);
@@ -140,18 +146,21 @@ test.describe('Heimdall Extension - Chrome', () => {
 
     test('should add a new feed', async ({ page }) => {
       await page.addInitScript(() => {
-        localStorage.setItem('Heimdall.Feeds', JSON.stringify({
-          HN: 'https://news.ycombinator.com/rss',
-          LWN: 'https://lwn.net/headlines/rss',
-          OWID: 'https://ourworldindata.org/atom.xml',
-        }));
+        localStorage.setItem(
+          'Heimdall.Feeds',
+          JSON.stringify({
+            HN: 'https://news.ycombinator.com/rss',
+            LWN: 'https://lwn.net/headlines/rss',
+            OWID: 'https://ourworldindata.org/atom.xml',
+          }),
+        );
       });
       await page.goto('/dashboard/dashboard.html');
       await page.waitForTimeout(2000);
       await page.locator('.nav-item[data-view="settings"]').click();
       await page.locator('#new-feed-name').fill('Custom Feed');
       await page.locator('#new-feed-url').fill('https://example.com/custom.rss');
-      page.on('dialog', dialog => dialog.accept());
+      page.on('dialog', (dialog) => dialog.accept());
       await page.locator('#add-feed-btn').click();
       await expect(page.locator('#sidebar-feeds')).toContainText('Custom Feed');
       await expect(page.locator('#manage-feeds-list')).toContainText('Custom Feed');
@@ -165,9 +174,9 @@ test.describe('Heimdall Extension - Firefox', () => {
 
   test.beforeEach(async ({ page }) => {
     abortMocking = false;
-    Object.keys(routeDelays).forEach(k => delete routeDelays[k]);
-    page.on('console', msg => console.log('PAGE LOG:', msg.text()));
-    page.on('pageerror', error => console.log('PAGE ERROR:', error.message));
+    for (const k of Object.keys(routeDelays)) delete routeDelays[k];
+    page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
+    page.on('pageerror', (error) => console.log('PAGE ERROR:', error.message));
     await setUpMockRoutes(page);
   });
 
@@ -214,7 +223,10 @@ test.describe('Heimdall Extension - Firefox', () => {
       await page.waitForTimeout(2000);
       await page.locator('text=HN Mock Item 1').click();
       await expect(page.locator('#preview-panel')).toHaveClass(/open/);
-      await expect(page.locator('#preview-frame')).toHaveAttribute('src', 'https://example.com/hn1');
+      await expect(page.locator('#preview-frame')).toHaveAttribute(
+        'src',
+        'https://example.com/hn1',
+      );
       await page.locator('#close-preview-btn').click();
       await expect(page.locator('#preview-panel')).not.toHaveClass(/open/);
     });
@@ -234,11 +246,14 @@ test.describe('Heimdall Extension - Firefox', () => {
 
     test('should navigate to individual feed via sidebar', async ({ page }) => {
       await page.addInitScript(() => {
-        localStorage.setItem('Heimdall.Feeds', JSON.stringify({
-          HN: 'https://news.ycombinator.com/rss',
-          LWN: 'https://lwn.net/headlines/rss',
-          OWID: 'https://ourworldindata.org/atom.xml',
-        }));
+        localStorage.setItem(
+          'Heimdall.Feeds',
+          JSON.stringify({
+            HN: 'https://news.ycombinator.com/rss',
+            LWN: 'https://lwn.net/headlines/rss',
+            OWID: 'https://ourworldindata.org/atom.xml',
+          }),
+        );
       });
       await page.goto('/dashboard/dashboard.html');
       await page.waitForTimeout(2000);
@@ -251,9 +266,9 @@ test.describe('Heimdall Extension - Firefox', () => {
     });
 
     test('should show loading state then render feeds', async ({ page }) => {
-      routeDelays['hn'] = 3000;
-      routeDelays['lwn'] = 3000;
-      routeDelays['owid'] = 3000;
+      routeDelays.hn = 3000;
+      routeDelays.lwn = 3000;
+      routeDelays.owid = 3000;
       await page.goto('/dashboard/dashboard.html');
       await expect(page.locator('#home-articles')).toContainText(/Loading/);
       await page.waitForTimeout(4000);
@@ -265,18 +280,21 @@ test.describe('Heimdall Extension - Firefox', () => {
 
     test('should add a new feed', async ({ page }) => {
       await page.addInitScript(() => {
-        localStorage.setItem('Heimdall.Feeds', JSON.stringify({
-          HN: 'https://news.ycombinator.com/rss',
-          LWN: 'https://lwn.net/headlines/rss',
-          OWID: 'https://ourworldindata.org/atom.xml',
-        }));
+        localStorage.setItem(
+          'Heimdall.Feeds',
+          JSON.stringify({
+            HN: 'https://news.ycombinator.com/rss',
+            LWN: 'https://lwn.net/headlines/rss',
+            OWID: 'https://ourworldindata.org/atom.xml',
+          }),
+        );
       });
       await page.goto('/dashboard/dashboard.html');
       await page.waitForTimeout(2000);
       await page.locator('.nav-item[data-view="settings"]').click();
       await page.locator('#new-feed-name').fill('Custom Feed');
       await page.locator('#new-feed-url').fill('https://example.com/custom.rss');
-      page.on('dialog', dialog => dialog.accept());
+      page.on('dialog', (dialog) => dialog.accept());
       await page.locator('#add-feed-btn').click();
       await expect(page.locator('#sidebar-feeds')).toContainText('Custom Feed');
       await expect(page.locator('#manage-feeds-list')).toContainText('Custom Feed');
