@@ -1,11 +1,6 @@
-import "./setup";
-import {
-  addFeed,
-  clearFeedsCache,
-  getFeeds,
-  removeFeed,
-} from "../src/core/storage";
-import { DEFAULT_FEEDS } from "../src/types";
+import './setup';
+import { addFeed, clearFeedsCache, getFeeds, removeFeed } from '../src/core/storage';
+import { DEFAULT_FEEDS } from '../src/types';
 
 beforeEach(() => {
   localStorage.clear();
@@ -35,7 +30,7 @@ describe('Feed Management', () => {
   it('addFeed adds a feed', () => {
     addFeed('NewFeed', 'http://new.com');
     const feeds = getFeeds();
-    expect(feeds.NewFeed).toBe("http://new.com");
+    expect(feeds.NewFeed).toBe('http://new.com');
   });
 
   it('removeFeed removes a feed', () => {

@@ -1,12 +1,7 @@
-import "./setup";
-import { getMixedFeed, updateFeed, updateIfReady } from "../src/core/feeds";
-import {
-  clearFeedsCache,
-  getFeeds,
-  saveFeedLinks,
-  saveFeeds,
-} from "../src/core/storage";
-import { MockXMLHttpRequest } from "./xml-mock";
+import './setup';
+import { getMixedFeed, updateFeed, updateIfReady } from '../src/core/feeds';
+import { clearFeedsCache, getFeeds, saveFeedLinks, saveFeeds } from '../src/core/storage';
+import { MockXMLHttpRequest } from './xml-mock';
 
 beforeEach(() => {
   localStorage.clear();

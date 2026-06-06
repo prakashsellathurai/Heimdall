@@ -1,18 +1,10 @@
-import { type FeedItem, MIXED_FEED_TIMEOUT, RETRY_MS } from "../types";
-import { parseFeedLinks } from "./parser";
-import {
-  getFeedLinks,
-  getFeeds,
-  getLastRefresh,
-  saveFeedLinks,
-  setLastRefresh,
-} from "./storage";
+import { type FeedItem, MIXED_FEED_TIMEOUT, RETRY_MS } from '../types';
+import { parseFeedLinks } from './parser';
+import { getFeedLinks, getFeeds, getLastRefresh, saveFeedLinks, setLastRefresh } from './storage';
 
 let _onFeedUpdate: ((key: string, items: FeedItem[]) => void) | null = null;
 
-export function setOnFeedUpdate(
-  cb: ((key: string, items: FeedItem[]) => void) | null,
-): void {
+export function setOnFeedUpdate(cb: ((key: string, items: FeedItem[]) => void) | null): void {
   _onFeedUpdate = cb;
 }
 
@@ -86,10 +78,7 @@ export function updateIfReady(
   }
 }
 
-export function updateFeed(
-  feedKey: string,
-  callback?: (links: FeedItem[]) => void,
-): void {
+export function updateFeed(feedKey: string, callback?: (links: FeedItem[]) => void): void {
   const feeds = getFeeds();
   const url = feeds[feedKey];
 
@@ -99,7 +88,7 @@ export function updateFeed(
   }
 
   const xhr = new XMLHttpRequest();
-  xhr.open("GET", url);
+  xhr.open('GET', url);
 
   xhr.onload = () => {
     if (xhr.status === 200) {
@@ -116,11 +105,7 @@ export function updateFeed(
   xhr.send();
 }
 
-function onRssSuccess(
-  feedKey: string,
-  doc: string,
-  callback?: (links: FeedItem[]) => void,
-): void {
+function onRssSuccess(feedKey: string, doc: string, callback?: (links: FeedItem[]) => void): void {
   if (!doc) {
     handleFeedParsingFailed(feedKey);
     return;
@@ -140,10 +125,7 @@ function handleFeedParsingFailed(feedKey: string): void {
   setLastRefresh(feedKey, lastRefresh + RETRY_MS);
 }
 
-function onRssError(
-  feedKey: string,
-  callback?: (links: FeedItem[]) => void,
-): void {
+function onRssError(feedKey: string, callback?: (links: FeedItem[]) => void): void {
   handleFeedParsingFailed(feedKey);
   callback?.([]);
 }
