@@ -1,6 +1,11 @@
-import { DEFAULT_FEEDS, STORAGE_KEYS, REFRESH_INTERVAL, DEFAULT_REQUEST_INTERVAL } from '../types';
-import { setInitialOption } from '../core/storage';
-import { updateIfReady } from '../core/feeds';
+import {
+  DEFAULT_FEEDS,
+  STORAGE_KEYS,
+  REFRESH_INTERVAL,
+  DEFAULT_REQUEST_INTERVAL,
+} from "../types";
+import { setInitialOption } from "../core/storage";
+import { updateIfReady } from "../core/feeds";
 
 let firstRequest = true;
 
@@ -12,8 +17,14 @@ function startRequest(): void {
   setTimeout(startRequest, REFRESH_INTERVAL);
 }
 
-setInitialOption('HN' + STORAGE_KEYS.REQUEST_INTERVAL_SUFFIX, String(DEFAULT_REQUEST_INTERVAL));
-setInitialOption('LWN' + STORAGE_KEYS.REQUEST_INTERVAL_SUFFIX, String(DEFAULT_REQUEST_INTERVAL));
-setInitialOption(STORAGE_KEYS.BACKGROUND_TABS, 'false');
+setInitialOption(
+  "HN" + STORAGE_KEYS.REQUEST_INTERVAL_SUFFIX,
+  String(DEFAULT_REQUEST_INTERVAL),
+);
+setInitialOption(
+  "LWN" + STORAGE_KEYS.REQUEST_INTERVAL_SUFFIX,
+  String(DEFAULT_REQUEST_INTERVAL),
+);
+setInitialOption(STORAGE_KEYS.BACKGROUND_TABS, "false");
 
 startRequest();
