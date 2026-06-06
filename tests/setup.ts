@@ -1,8 +1,8 @@
-import { JSDOM } from 'jsdom';
-import { MockXMLHttpRequest } from './xml-mock';
+import { JSDOM } from "jsdom";
+import { MockXMLHttpRequest } from "./xml-mock";
 
-const dom = new JSDOM('<!DOCTYPE html><html><body></body></html>', {
-  url: 'http://localhost/',
+const dom = new JSDOM("<!DOCTYPE html><html><body></body></html>", {
+  url: "http://localhost/",
   pretendToBeVisual: true,
   storageQuota: 10 * 1024 * 1024,
 });

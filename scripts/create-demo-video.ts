@@ -1,8 +1,13 @@
-import { type ChildProcess, spawn } from 'node:child_process';
-import fs from 'node:fs';
-import http from 'node:http';
-import path from 'node:path';
-import { type Browser, type BrowserContext, chromium, type Page } from 'playwright';
+import { type ChildProcess, spawn } from "node:child_process";
+import fs from "node:fs";
+import http from "node:http";
+import path from "node:path";
+import {
+  type Browser,
+  type BrowserContext,
+  chromium,
+  type Page,
+} from "playwright";
 
 const OUTPUT_VIDEO = process.env.OUTPUT_VIDEO || 'demo/heimdall-demo.webm';
 const DEMO_DIR = path.dirname(OUTPUT_VIDEO);
@@ -141,7 +146,7 @@ async function recordDemo(): Promise<void> {
   await sleep(page, 1500);
 
   // Auto-accept all dialogs (alert/confirm) from here on
-  page.on('dialog', (dialog) => dialog.accept());
+  page.on("dialog", (dialog) => dialog.accept());
 
   // ---- SCENE 9: Add a new feed ----
   console.log('[9/11] Adding a new feed...');
@@ -165,7 +170,7 @@ async function recordDemo(): Promise<void> {
   server.kill();
 
   // Rename the auto-named video to the desired output path
-  const files = fs.readdirSync(DEMO_DIR).filter((f) => f.endsWith('.webm'));
+  const files = fs.readdirSync(DEMO_DIR).filter((f) => f.endsWith(".webm"));
   if (files.length > 0) {
     const src = path.join(DEMO_DIR, files[0]);
     fs.renameSync(src, OUTPUT_VIDEO);
@@ -175,6 +180,6 @@ async function recordDemo(): Promise<void> {
 }
 
 recordDemo().catch((err) => {
-  console.error('Demo recording failed:', err);
+  console.error("Demo recording failed:", err);
   process.exit(1);
 });
