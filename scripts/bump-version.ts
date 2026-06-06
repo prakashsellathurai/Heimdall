@@ -192,7 +192,12 @@ async function main(): Promise<void> {
   }
   console.log('  ✓ Versions match');
 
-  const nextVersion = args.version ?? bumpSemver(manifestVersion, args.bumpType!);
+  if (!args.version && !args.bumpType) {
+    console.error('\n✗ Either an explicit version or --bump-type is required.');
+    process.exit(1);
+  }
+
+  const nextVersion = args.version ?? bumpSemver(manifestVersion, args.bumpType as BumpType);
 
   if (!isGreaterVersion(nextVersion, manifestVersion)) {
     console.error(

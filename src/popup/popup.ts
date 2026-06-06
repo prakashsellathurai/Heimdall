@@ -5,19 +5,6 @@ import { openUrl, openOptionsPage } from '../core/browser';
 
 let currentFeed: string = localStorage.getItem(STORAGE_KEYS.LAST_POPUP_FEED) || 'Home';
 
-function showToast(message: string): void {
-  const toast = document.createElement('div');
-  toast.textContent = message;
-  toast.style.cssText =
-    'position:fixed;bottom:8px;left:8px;right:8px;background:#333;color:#fff;padding:8px 12px;border-radius:6px;font-size:13px;z-index:999;text-align:center;opacity:0;transition:opacity 0.2s';
-  document.body.appendChild(toast);
-  requestAnimationFrame(() => { toast.style.opacity = '1'; });
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    setTimeout(() => toast.remove(), 200);
-  }, 2000);
-}
-
 setOnFeedUpdate((key: string) => {
   if (key === currentFeed) {
     const cached = getFeedLinks(key);
@@ -121,7 +108,7 @@ function buildPopup(links: FeedItem[] | null): void {
   const feed = document.getElementById('feed');
   if (!feed) return;
 
-  while (feed.hasChildNodes()) feed.removeChild(feed.firstChild!);
+  while (feed.firstChild) feed.removeChild(feed.firstChild);
 
   if (!links || links.length === 0) {
     const row = document.createElement('tr');
@@ -180,7 +167,7 @@ function buildPopup(links: FeedItem[] | null): void {
 function refreshLinks(): void {
   const feed = document.getElementById('feed');
   if (feed) {
-    while (feed.hasChildNodes()) feed.removeChild(feed.firstChild!);
+    while (feed.firstChild) feed.removeChild(feed.firstChild);
   }
 
   hideElement('container');

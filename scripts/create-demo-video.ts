@@ -11,7 +11,7 @@ const PROJECT_ROOT = path.resolve(__dirname, '..');
 const PREVIEW_PORT = 4173;
 const PREVIEW_URL = `http://localhost:${PREVIEW_PORT}`;
 
-async function waitForServer(url: string, timeoutMs: number = 10000): Promise<void> {
+async function waitForServer(url: string, timeoutMs = 10000): Promise<void> {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
     try {

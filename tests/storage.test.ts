@@ -1,5 +1,5 @@
 import './setup';
-import { getFeeds, saveFeeds, addFeed, removeFeed, clearFeedsCache } from '../src/core/storage';
+import { getFeeds, addFeed, removeFeed, clearFeedsCache } from '../src/core/storage';
 import { DEFAULT_FEEDS } from '../src/types';
 
 beforeEach(() => {
@@ -11,7 +11,7 @@ describe('Feed Management', () => {
   it('getFeeds returns default feeds when empty', () => {
     const feeds = getFeeds();
     expect(feeds).toEqual(DEFAULT_FEEDS);
-    expect(JSON.parse(localStorage.getItem('Heimdall.Feeds')!)).toEqual(DEFAULT_FEEDS);
+    expect(localStorage.getItem('Heimdall.Feeds')).toBe(JSON.stringify(DEFAULT_FEEDS));
   });
 
   it('getFeeds returns stored feeds', () => {

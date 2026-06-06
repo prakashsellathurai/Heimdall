@@ -1,7 +1,6 @@
 import './setup';
 import { getFeeds, saveFeeds, saveFeedLinks, clearFeedsCache } from '../src/core/storage';
 import { updateFeed, updateIfReady, getMixedFeed } from '../src/core/feeds';
-import { DEFAULT_FEEDS } from '../src/types';
 import { MockXMLHttpRequest } from './xml-mock';
 
 beforeEach(() => {

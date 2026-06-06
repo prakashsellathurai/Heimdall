@@ -3,7 +3,7 @@ import { FeedItem, MAX_FEED_ITEMS } from '../types';
 function getTextContent(
   element: Element,
   tagName: string,
-  index: number = 0
+  index = 0
 ): string | null {
   const tags = element.getElementsByTagName(tagName);
   const tag = tags[index];
@@ -14,7 +14,7 @@ function getAttribute(
   element: Element,
   tagName: string,
   attr: string,
-  index: number = 0
+  index = 0
 ): string | null {
   const tags = element.getElementsByTagName(tagName);
   const tag = tags[index];

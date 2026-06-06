@@ -2,8 +2,6 @@ import { FeedItem, STORAGE_KEYS } from '../types';
 import { getFeeds, getFeedLinks, addFeed, removeFeed } from '../core/storage';
 import { getMixedFeed, updateFeed } from '../core/feeds';
 
-let currentDashboardFeed: string | null = null;
-
 function showToast(message: string): void {
   const existing = document.getElementById('heimdall-toast');
   if (existing) existing.remove();
