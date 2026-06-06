@@ -2,6 +2,7 @@
 
 Heimdall is a feature-rich RSS feed curator available as a browser extension. It helps you stay updated with the latest news from Hacker News (HN), LWN.net, and any other RSS feeds you care about, all in one place.
 
+
 ## Features
 
 - **Multi-Feed Support**: Comes with HN and LWN by default, but you can add any RSS/Atom feed.
