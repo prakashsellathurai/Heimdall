@@ -1,13 +1,26 @@
 version = 1
 
+exclude_patterns = [
+  "dist/**",
+  "node_modules/**",
+  "demo/**",
+  "coverage/**",
+  "public/**",
+]
+
+test_patterns = [
+  "tests/**",
+  "benchmarks/**",
+]
+
 [[analyzers]]
 name = "javascript"
 enabled = true
 
-[[analyzers]]
-name = "typescript"
-enabled = true
+  [analyzers.meta]
+  environment = ["browser", "nodejs"]
+  dependency_file_paths = ["package.json"]
 
-[[analyzers]]
-name = "secrets"
+[[code_formatters]]
+name = "prettier"
 enabled = true
