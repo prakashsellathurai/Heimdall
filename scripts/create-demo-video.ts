@@ -1,11 +1,45 @@
 import { chromium, Browser, BrowserContext, Page } from 'playwright';
 import path from 'path';
 import fs from 'fs';
+import { spawn, ChildProcess } from 'child_process';
+import http from 'http';
 
 const OUTPUT_VIDEO = process.env.OUTPUT_VIDEO || 'demo/heimdall-demo.webm';
 const DEMO_DIR = path.dirname(OUTPUT_VIDEO);
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
+const PREVIEW_PORT = 4173;
+const PREVIEW_URL = `http://localhost:${PREVIEW_PORT}`;
+
+async function waitForServer(url: string, timeoutMs: number = 10000): Promise<void> {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const req = http.get(url, (res) => {
+          res.resume();
+          if (res.statusCode && res.statusCode < 500) resolve();
+          else reject(new Error(`status ${res.statusCode}`));
+        });
+        req.on('error', reject);
+        req.setTimeout(1000, () => req.destroy(new Error('timeout')));
+      });
+      return;
+    } catch {
+      await new Promise(r => setTimeout(r, 200));
+    }
+  }
+  throw new Error(`Server at ${url} did not become ready within ${timeoutMs}ms`);
+}
+
+async function startPreviewServer(): Promise<ChildProcess> {
+  const server = spawn('npx', ['vite', 'preview', '--port', String(PREVIEW_PORT), '--strictPort'], {
+    cwd: PROJECT_ROOT,
+    stdio: 'inherit',
+  });
+  await waitForServer(PREVIEW_URL);
+  return server;
+}
 
 const chromeMock = `
   window.chrome = {
@@ -20,26 +54,29 @@ const LS_SETUP = `
     'LWN': 'https://lwn.net/headlines/rss',
     'OWID': 'https://ourworldindata.org/atom.xml'
   }));
-  localStorage.setItem('HN.NumLinks', '3');
-  localStorage.setItem('HN.Link0', JSON.stringify({ Title: 'HN Article 1', Link: 'https://example.com/hn1', CommentsLink: 'https://news.ycombinator.com/item?id=1' }));
-  localStorage.setItem('HN.Link1', JSON.stringify({ Title: 'HN Article 2', Link: 'https://example.com/hn2', CommentsLink: 'https://news.ycombinator.com/item?id=2' }));
-  localStorage.setItem('HN.Link2', JSON.stringify({ Title: 'HN Article 3', Link: 'https://example.com/hn3', CommentsLink: 'https://news.ycombinator.com/item?id=3' }));
-  localStorage.setItem('LWN.NumLinks', '3');
-  localStorage.setItem('LWN.Link0', JSON.stringify({ Title: 'LWN Article 1', Link: 'https://lwn.net/Articles/1' }));
-  localStorage.setItem('LWN.Link1', JSON.stringify({ Title: 'LWN Article 2', Link: 'https://lwn.net/Articles/2' }));
-  localStorage.setItem('LWN.Link2', JSON.stringify({ Title: 'LWN Article 3', Link: 'https://lwn.net/Articles/3' }));
-  localStorage.setItem('OWID.NumLinks', '3');
-  localStorage.setItem('OWID.Link0', JSON.stringify({ Title: 'OWID Article 1', Link: 'https://example.com/owid1' }));
-  localStorage.setItem('OWID.Link1', JSON.stringify({ Title: 'OWID Article 2', Link: 'https://example.com/owid2' }));
-  localStorage.setItem('OWID.Link2', JSON.stringify({ Title: 'OWID Article 3', Link: 'https://example.com/owid3' }));
+  localStorage.setItem('HN', JSON.stringify([
+    { Title: 'HN Article 1', Link: 'https://example.com/hn1', CommentsLink: 'https://news.ycombinator.com/item?id=1' },
+    { Title: 'HN Article 2', Link: 'https://example.com/hn2', CommentsLink: 'https://news.ycombinator.com/item?id=2' },
+    { Title: 'HN Article 3', Link: 'https://example.com/hn3', CommentsLink: 'https://news.ycombinator.com/item?id=3' }
+  ]));
+  localStorage.setItem('LWN', JSON.stringify([
+    { Title: 'LWN Article 1', Link: 'https://lwn.net/Articles/1', CommentsLink: '' },
+    { Title: 'LWN Article 2', Link: 'https://lwn.net/Articles/2', CommentsLink: '' },
+    { Title: 'LWN Article 3', Link: 'https://lwn.net/Articles/3', CommentsLink: '' }
+  ]));
+  localStorage.setItem('OWID', JSON.stringify([
+    { Title: 'OWID Article 1', Link: 'https://example.com/owid1', CommentsLink: '' },
+    { Title: 'OWID Article 2', Link: 'https://example.com/owid2', CommentsLink: '' },
+    { Title: 'OWID Article 3', Link: 'https://example.com/owid3', CommentsLink: '' }
+  ]));
 `;
 
 function popupUrl(): string {
-  return 'file://' + path.join(PROJECT_ROOT, 'popup.html');
+  return 'http://localhost:4173/popup/popup.html';
 }
 
 function dashboardUrl(): string {
-  return 'file://' + path.join(PROJECT_ROOT, 'dashboard.html');
+  return 'http://localhost:4173/dashboard/dashboard.html';
 }
 
 async function sleep(page: Page, ms: number): Promise<void> {
@@ -47,6 +84,9 @@ async function sleep(page: Page, ms: number): Promise<void> {
 }
 
 async function recordDemo(): Promise<void> {
+  console.log('Starting vite preview server...');
+  const server = await startPreviewServer();
+
   console.log('Launching Chromium...');
   const browser: Browser = await chromium.launch({ headless: true });
 
@@ -122,6 +162,7 @@ async function recordDemo(): Promise<void> {
 
   await context.close();
   await browser.close();
+  server.kill();
 
   // Rename the auto-named video to the desired output path
   const files = fs.readdirSync(DEMO_DIR).filter(f => f.endsWith('.webm'));
