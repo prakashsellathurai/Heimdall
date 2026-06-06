@@ -20,14 +20,14 @@
   "action": {
     "default_title": "Heimdall",
     "default_icon": "images/icon48.png",
-    "default_popup": "popup.html"
+    "default_popup": "popup/popup.html"
   },
   "background": {
     "service_worker": "js/background.js",
     "type": "module"
   },
   "options_ui": {
-    "page": "dashboard.html",
+    "page": "dashboard/dashboard.html",
     "open_in_tab": true
   },
   "permissions": [
