@@ -1,7 +1,7 @@
 import { openOptionsPage, openUrl } from '../core/browser';
 import { getMixedFeed, setOnFeedUpdate, triggerFeedUpdate, updateFeed } from '../core/feeds';
 import { getFeedLinks, getFeeds } from '../core/storage';
-import { MAX_POPUP_FEED_TABS, type FeedItem, STORAGE_KEYS } from '../types';
+import { type FeedItem, MAX_POPUP_FEED_TABS, STORAGE_KEYS } from '../types';
 
 let currentFeed: string = localStorage.getItem(STORAGE_KEYS.LAST_POPUP_FEED) || 'Home';
 
