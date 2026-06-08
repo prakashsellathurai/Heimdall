@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+
+set -e
+
+# Install deps if node_modules is missing
+if [ ! -d "./node_modules" ]; then
+    echo "📦 Installing dependencies..."
+    bun install
+fi
+
+# Ensure biome exists
+if ! command -v bun >/dev/null 2>&1; then
+    echo "❌ Bun is not installed"
+    exit 1
+fi
+
+echo "🔍 Running Biome lint fixes..."
+bunx @biomejs/biome check --write .
+
+git add .

@@ -16,7 +16,8 @@
     "lint": "biome check",
     "lint:fix": "biome check --write",
     "format": "biome format --write",
-    "format:check": "biome format"
+    "format:check": "biome format",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.16",
@@ -24,6 +25,7 @@
     "@playwright/test": "^1.57.0",
     "archiver": "^8.0.0",
     "chrome-types": "^0.1.429",
+    "husky": "^9.1.7",
     "jsdom": "^27.4.0",
     "typescript": "^6.0.3",
     "vite": "^8.0.14"
