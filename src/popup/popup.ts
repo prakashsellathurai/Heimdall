@@ -1,7 +1,7 @@
 import { openOptionsPage, openUrl } from '../core/browser';
 import { getMixedFeed, setOnFeedUpdate, triggerFeedUpdate, updateFeed } from '../core/feeds';
 import { getFeedLinks, getFeeds } from '../core/storage';
-import { type FeedItem, STORAGE_KEYS } from '../types';
+import { MAX_POPUP_FEED_TABS, type FeedItem, STORAGE_KEYS } from '../types';
 
 let currentFeed: string = localStorage.getItem(STORAGE_KEYS.LAST_POPUP_FEED) || 'Home';
 
@@ -53,13 +53,16 @@ function renderTabs(): void {
   homeBtn.textContent = 'Home';
   tabsContainer.appendChild(homeBtn);
 
+  let tabCount = 0;
   for (const key in feeds) {
+    if (tabCount >= MAX_POPUP_FEED_TABS) break;
     if (Object.hasOwn(feeds, key)) {
       const btn = document.createElement('button');
       btn.className = `tab-button${currentFeed === key ? ' active' : ''}`;
       btn.setAttribute('data-feed', key);
       btn.textContent = key;
       tabsContainer.appendChild(btn);
+      tabCount++;
     }
   }
 }

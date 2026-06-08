@@ -29,3 +29,4 @@ export const RETRY_MS = 120000;
 export const MIXED_FEED_TIMEOUT = 10000;
 export const REFRESH_INTERVAL = 60000;
 export const DEFAULT_REQUEST_INTERVAL = 1200000;
+export const MAX_POPUP_FEED_TABS = 3;

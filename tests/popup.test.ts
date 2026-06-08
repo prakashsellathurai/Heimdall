@@ -54,6 +54,30 @@ describe('Popup Logic', () => {
     expect(tabs[2].textContent).toBe('LWN');
   });
 
+  it('renderTabs caps feed tabs at MAX_POPUP_FEED_TABS', async () => {
+    localStorage.setItem(
+      'Heimdall.Feeds',
+      JSON.stringify({
+        A: 'http://a.com',
+        B: 'http://b.com',
+        C: 'http://c.com',
+        D: 'http://d.com',
+      }),
+    );
+    const { clearFeedsCache } = await import('../src/core/storage');
+    clearFeedsCache();
+
+    const { renderTabs } = await import('../src/popup/popup');
+    renderTabs();
+
+    const tabs = document.querySelectorAll('.tab-button');
+    expect(tabs.length).toBe(4);
+    expect(tabs[0].textContent).toBe('Home');
+    expect(tabs[1].textContent).toBe('A');
+    expect(tabs[2].textContent).toBe('B');
+    expect(tabs[3].textContent).toBe('C');
+  });
+
   it('switchTab changes active tab', async () => {
     localStorage.setItem('Heimdall.Feeds', JSON.stringify({ HN: 'http://hn.com' }));
     const { clearFeedsCache } = await import('../src/core/storage');
