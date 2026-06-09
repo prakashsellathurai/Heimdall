@@ -1,6 +1,21 @@
-import { type FeedItem, MIXED_FEED_TIMEOUT, RETRY_MS } from '../types';
+import {
+  COLD_START_BONUS,
+  type FeedItem,
+  MIXED_FEED_TIMEOUT,
+  MS_TO_HOURS,
+  RETRY_MS,
+  SCORE_WEIGHTS,
+} from '../types';
 import { parseFeedLinks } from './parser';
-import { getFeedLinks, getFeeds, getLastRefresh, saveFeedLinks, setLastRefresh } from './storage';
+import {
+  getClickCount,
+  getFeedLinks,
+  getFeeds,
+  getLastInteraction,
+  getLastRefresh,
+  saveFeedLinks,
+  setLastRefresh,
+} from './storage';
 
 let _onFeedUpdate: ((key: string, items: FeedItem[]) => void) | null = null;
 
@@ -128,4 +143,49 @@ function handleFeedParsingFailed(feedKey: string): void {
 function onRssError(feedKey: string, callback?: (links: FeedItem[]) => void): void {
   handleFeedParsingFailed(feedKey);
   callback?.([]);
+}
+
+export function getRecommendedFeeds(max: number): string[] {
+  const feeds = getFeeds();
+  const keys = Object.keys(feeds);
+  if (keys.length <= max) return keys;
+
+  let maxClicks = 1;
+  for (const key of keys) {
+    const clicks = getClickCount(key);
+    if (clicks > maxClicks) maxClicks = clicks;
+  }
+
+  const scored = keys.map((key) => {
+    const lastInteraction = getLastInteraction(key);
+    const hoursSinceInteraction = lastInteraction
+      ? (Date.now() - lastInteraction) / MS_TO_HOURS
+      : Infinity;
+    const recencyFactor = lastInteraction ? 1 / (1 + hoursSinceInteraction) : 0;
+
+    const clicks = getClickCount(key);
+    const engagementFactor = maxClicks > 0 ? clicks / maxClicks : 0;
+
+    const lastRefresh = getLastRefresh(key);
+    const hoursSinceRefresh = lastRefresh ? (Date.now() - lastRefresh) / MS_TO_HOURS : Infinity;
+    const freshnessFactor = lastRefresh ? 1 / (1 + hoursSinceRefresh) : 0;
+
+    let score =
+      SCORE_WEIGHTS.RECENCY * recencyFactor +
+      SCORE_WEIGHTS.ENGAGEMENT * engagementFactor +
+      SCORE_WEIGHTS.FRESHNESS * freshnessFactor;
+
+    if (lastInteraction === 0 && clicks === 0) {
+      score += COLD_START_BONUS;
+    }
+
+    return { key, score };
+  });
+
+  scored.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return a.key.localeCompare(b.key);
+  });
+
+  return scored.slice(0, max).map((s) => s.key);
 }

@@ -82,3 +82,19 @@ export function setInitialOption(key: string, value: string): void {
     localStorage.setItem(key, value);
   }
 }
+
+export function recordInteraction(feedKey: string): void {
+  const clickKey = feedKey + STORAGE_KEYS.CLICK_COUNT_SUFFIX;
+  const current = parseInt(localStorage.getItem(clickKey) || '0', 10);
+  localStorage.setItem(clickKey, String(current + 1));
+  localStorage.setItem(feedKey + STORAGE_KEYS.LAST_INTERACTION_SUFFIX, String(Date.now()));
+}
+
+export function getClickCount(feedKey: string): number {
+  return parseInt(localStorage.getItem(feedKey + STORAGE_KEYS.CLICK_COUNT_SUFFIX) || '0', 10);
+}
+
+export function getLastInteraction(feedKey: string): number {
+  const val = localStorage.getItem(feedKey + STORAGE_KEYS.LAST_INTERACTION_SUFFIX);
+  return val ? parseFloat(val) : 0;
+}

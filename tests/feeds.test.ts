@@ -1,6 +1,16 @@
 import './setup';
-import { getMixedFeed, updateFeed, updateIfReady } from '../src/core/feeds';
-import { clearFeedsCache, getFeeds, saveFeedLinks, saveFeeds } from '../src/core/storage';
+import { getMixedFeed, getRecommendedFeeds, updateFeed, updateIfReady } from '../src/core/feeds';
+import {
+  clearFeedsCache,
+  getClickCount,
+  getFeeds,
+  getLastRefresh,
+  recordInteraction,
+  saveFeedLinks,
+  saveFeeds,
+  setLastRefresh,
+} from '../src/core/storage';
+import { MAX_POPUP_FEED_TABS } from '../src/types';
 import { MockXMLHttpRequest } from './xml-mock';
 
 beforeEach(() => {
@@ -122,5 +132,122 @@ describe('UpdateIfReady', () => {
     const cb = jest.fn();
     updateIfReady('HN', false, cb);
     expect(cb).not.toHaveBeenCalled();
+  });
+});
+
+describe('Recommendation Logic', () => {
+  beforeEach(() => {
+    // Initialize with 5 feeds so recommendation chooses from > MAX_POPUP_FEED_TABS
+    saveFeeds({
+      Alpha: 'http://alpha.com',
+      Beta: 'http://beta.com',
+      Gamma: 'http://gamma.com',
+      Delta: 'http://delta.com',
+      Epsilon: 'http://epsilon.com',
+    });
+    clearFeedsCache();
+  });
+
+  it('returns all feeds when count <= max', () => {
+    const result = getRecommendedFeeds(10);
+    expect(result).toHaveLength(5);
+  });
+
+  it('returns max feeds when more feeds than max', () => {
+    const result = getRecommendedFeeds(MAX_POPUP_FEED_TABS);
+    expect(result).toHaveLength(MAX_POPUP_FEED_TABS);
+  });
+
+  it('prioritizes feeds with recent interactions', () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(100_000);
+
+    setLastRefresh('Alpha', 100_000);
+    setLastRefresh('Beta', 100_000);
+    setLastRefresh('Gamma', 100_000);
+    setLastRefresh('Delta', 100_000);
+    setLastRefresh('Epsilon', 100_000);
+
+    // Record interaction for Beta (most recent), Alpha (older), Gamma (oldest)
+    recordInteraction('Gamma');
+    jest.setSystemTime(200_000);
+    recordInteraction('Alpha');
+    jest.setSystemTime(300_000);
+    recordInteraction('Beta');
+
+    jest.setSystemTime(300_000);
+    const result = getRecommendedFeeds(3);
+    expect(result[0]).toBe('Beta');
+    expect(result[1]).toBe('Alpha');
+    expect(result[2]).toBe('Gamma');
+
+    jest.useRealTimers();
+  });
+
+  it('prioritizes feeds with more clicks', () => {
+    const now = Date.now();
+    setLastRefresh('Alpha', now);
+    setLastRefresh('Beta', now);
+    setLastRefresh('Gamma', now);
+    setLastRefresh('Delta', now);
+    setLastRefresh('Epsilon', now);
+
+    recordInteraction('Alpha');
+    recordInteraction('Alpha');
+    recordInteraction('Beta');
+    recordInteraction('Gamma');
+    recordInteraction('Gamma');
+    recordInteraction('Gamma');
+
+    const result = getRecommendedFeeds(3);
+    expect(result[0]).toBe('Gamma');
+    expect(result[1]).toBe('Alpha');
+    expect(result[2]).toBe('Beta');
+  });
+
+  it('cold-start feeds get a bonus score', () => {
+    // Give Delta and Epsilon high engagement but no interaction history for Alpha/Beta/Gamma
+    const now = Date.now();
+    setLastRefresh('Alpha', now);
+    setLastRefresh('Beta', now);
+    setLastRefresh('Gamma', now);
+    setLastRefresh('Delta', now);
+    setLastRefresh('Epsilon', now);
+
+    // Delta has very high clicks
+    recordInteraction('Delta');
+    recordInteraction('Delta');
+    recordInteraction('Delta');
+    recordInteraction('Delta');
+
+    // Epsilon has moderate clicks
+    recordInteraction('Epsilon');
+    recordInteraction('Epsilon');
+
+    // Alpha, Beta, Gamma are cold-start (0 clicks, 0 interaction)
+    // They should still appear in the top 3 due to cold-start bonus
+    // when competing against each other equally, they fall back to alphabetical
+
+    const result = getRecommendedFeeds(3);
+    // Delta has highest engagement
+    expect(result[0]).toBe('Delta');
+    // Alpha and Beta have cold-start bonus, Epsilon has some engagement
+    // With all at same freshness, Alpha has cold-start bonus + alphabetical tiebreak
+    expect(result).toContain('Alpha');
+  });
+
+  it('ties broken alphabetically', () => {
+    const now = Date.now();
+    setLastRefresh('Alpha', now);
+    setLastRefresh('Beta', now);
+    setLastRefresh('Gamma', now);
+    setLastRefresh('Delta', now);
+    setLastRefresh('Epsilon', now);
+
+    const result = getRecommendedFeeds(3);
+    // All have equal scores, alphabetical tiebreak: Alpha, Beta, Delta (D < G)
+    expect(result[0]).toBe('Alpha');
+    expect(result[1]).toBe('Beta');
+    expect(result[2]).toBe('Delta');
   });
 });

@@ -1,5 +1,13 @@
 import './setup';
-import { addFeed, clearFeedsCache, getFeeds, removeFeed } from '../src/core/storage';
+import {
+  addFeed,
+  clearFeedsCache,
+  getClickCount,
+  getFeeds,
+  getLastInteraction,
+  recordInteraction,
+  removeFeed,
+} from '../src/core/storage';
 import { DEFAULT_FEEDS } from '../src/types';
 
 beforeEach(() => {
@@ -38,5 +46,30 @@ describe('Feed Management', () => {
     removeFeed('ToRem');
     const feeds = getFeeds();
     expect(feeds.ToRem).toBeUndefined();
+  });
+});
+
+describe('Interaction Tracking', () => {
+  it('recordInteraction increments click count', () => {
+    recordInteraction('HN');
+    expect(getClickCount('HN')).toBe(1);
+    recordInteraction('HN');
+    expect(getClickCount('HN')).toBe(2);
+  });
+
+  it('recordInteraction updates last interaction timestamp', () => {
+    const before = Date.now();
+    recordInteraction('LWN');
+    const last = getLastInteraction('LWN');
+    expect(last).toBeGreaterThanOrEqual(before);
+    expect(last).toBeLessThanOrEqual(Date.now());
+  });
+
+  it('getClickCount returns 0 for never-interacted feed', () => {
+    expect(getClickCount('NonExistent')).toBe(0);
+  });
+
+  it('getLastInteraction returns 0 for never-interacted feed', () => {
+    expect(getLastInteraction('NonExistent')).toBe(0);
   });
 });
