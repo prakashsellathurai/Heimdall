@@ -10,6 +10,7 @@
     "test:watch": "bun test --isolate --watch tests/",
     "test:coverage": "bun test --isolate --coverage --path-ignore-patterns tests/e2e/*.spec.ts tests/",
     "test:e2e": "vite build && bun run playwright test",
+    "test:all": "vite build && bun test --isolate --path-ignore-patterns 'tests/e2e/*' && bun run playwright test",
     "benchmark": "bun run benchmarks/core.bench.ts --expose-gc",
     "bump-version": "bun run scripts/bump-version.ts",
     "create-demo-video": "bun run scripts/create-demo-video.ts",

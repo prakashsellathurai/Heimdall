@@ -248,6 +248,13 @@ a#title {
   border: none;
 }
 
+.btn-refresh {
+  float: right;
+  margin: 2px 4px 0 0;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
 /* Preview Panel */
 #preview-panel {
   position: fixed;

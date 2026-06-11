@@ -2,9 +2,7 @@ import './setup';
 import { getMixedFeed, getRecommendedFeeds, updateFeed, updateIfReady } from '../src/core/feeds';
 import {
   clearFeedsCache,
-  getClickCount,
   getFeeds,
-  getLastRefresh,
   recordInteraction,
   saveFeedLinks,
   saveFeeds,
