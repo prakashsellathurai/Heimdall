@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import {
+  clearFetchCounts,
   clearRouteDelays,
   routeDelays,
   setAbortMocking,
@@ -9,6 +10,7 @@ import {
 test.beforeEach(async ({ page }) => {
   setAbortMocking(false);
   clearRouteDelays();
+  clearFetchCounts();
   page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
   page.on('pageerror', (error) => console.log('PAGE ERROR:', error.message));
   await setUpMockRoutes(page);
@@ -129,5 +131,42 @@ test.describe('Dashboard View', () => {
     await page.locator('#add-feed-btn').click();
     await expect(page.locator('#sidebar-feeds')).toContainText('Custom Feed');
     await expect(page.locator('#manage-feeds-list')).toContainText('Custom Feed');
+  });
+
+  test('should refresh Home feed via refresh button', async ({ page }) => {
+    await page.goto('/dashboard/dashboard.html');
+    await page.waitForTimeout(2000);
+    await expect(page.locator('#home-articles')).toContainText('HN Mock Item 1');
+
+    await page.locator('#view-home #refresh-btn').click();
+    await page.waitForTimeout(2000);
+    const text = await page.locator('#home-articles').innerText();
+    expect(text).toContain('HN Mock Item 2 (Refreshed)');
+    expect(text).toContain('LWN Mock Item 2 (Refreshed)');
+    expect(text).toContain('OWID Mock Item 2 (Refreshed)');
+  });
+
+  test('should refresh individual feed via refresh button', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        'Heimdall.Feeds',
+        JSON.stringify({
+          HN: 'https://news.ycombinator.com/rss',
+          LWN: 'https://lwn.net/headlines/rss',
+          OWID: 'https://ourworldindata.org/atom.xml',
+        }),
+      );
+    });
+    await page.goto('/dashboard/dashboard.html');
+    await page.waitForTimeout(2000);
+    await page.locator('.nav-item[data-feed="LWN"]').click();
+    await expect(page.locator('#view-feed')).toBeVisible();
+    await expect(page.locator('#feed-articles')).toContainText('LWN Mock Item 1');
+
+    await page.locator('#view-feed #refresh-btn').click();
+    await page.waitForTimeout(2000);
+    await expect(page.locator('#feed-articles')).toContainText('LWN Mock Item 2 (Refreshed)');
+    await expect(page.locator('#feed-articles')).not.toContainText('HN Mock');
+    await expect(page.locator('#feed-articles')).not.toContainText('OWID Mock');
   });
 });

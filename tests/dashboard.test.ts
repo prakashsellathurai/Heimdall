@@ -1,14 +1,16 @@
 import './setup';
+import { MockXMLHttpRequest } from './xml-mock';
 
 describe('Dashboard Logic', () => {
   beforeEach(() => {
     document.body.innerHTML = `
       <div id="sidebar-feeds"></div>
       <div id="view-home" style="display:none">
+        <div id="header"><span>Home Feed</span><button type="button" id="refresh-btn" class="btn btn-refresh">Refresh</button></div>
         <div id="home-articles"></div>
       </div>
       <div id="view-feed" style="display:none">
-        <h2 id="feed-title"></h2>
+        <div id="header"><span id="feed-title"></span><button type="button" id="refresh-btn" class="btn btn-refresh">Refresh</button></div>
         <div id="feed-articles"></div>
       </div>
       <div id="view-settings" style="display:none">
@@ -109,5 +111,71 @@ describe('Dashboard Logic', () => {
 
     const toast = document.getElementById('heimdall-toast');
     expect(toast?.textContent).toContain('Please fill in both fields');
+  });
+
+  it('handleRefresh on home view fetches and renders all feeds', async () => {
+    localStorage.setItem(
+      'Heimdall.Feeds',
+      JSON.stringify({ F1: 'http://f1.com/rss', F2: 'http://f2.com/rss' }),
+    );
+    const { clearFeedsCache } = await import('../src/core/storage');
+    clearFeedsCache();
+
+    const homeView = document.getElementById('view-home');
+    if (homeView) homeView.style.display = 'block';
+
+    MockXMLHttpRequest.nextResponse = `<?xml version="1.0"?><rss version="2.0"><channel>
+      <item><title>Article A</title><link>http://a.com</link></item>
+      <item><title>Article B</title><link>http://b.com</link><comments>http://b.com/c</comments></item>
+    </channel></rss>`;
+    MockXMLHttpRequest.nextStatus = 200;
+    MockXMLHttpRequest.nextUrlContainsError = false;
+
+    const { handleRefresh } = await import('../src/dashboard/dashboard');
+    handleRefresh();
+
+    const container = document.getElementById('home-articles');
+    expect(container?.innerHTML).toContain('Article A');
+    expect(container?.innerHTML).toContain('Article B');
+  });
+
+  it('handleRefresh on home view shows empty message when no feeds', async () => {
+    localStorage.setItem('Heimdall.Feeds', JSON.stringify({}));
+    const { clearFeedsCache } = await import('../src/core/storage');
+    clearFeedsCache();
+
+    const homeView = document.getElementById('view-home');
+    if (homeView) homeView.style.display = 'block';
+
+    const { handleRefresh } = await import('../src/dashboard/dashboard');
+    handleRefresh();
+
+    const container = document.getElementById('home-articles');
+    expect(container?.textContent).toContain('No articles found');
+  });
+
+  it('handleRefresh on feed view fetches and renders the active feed', async () => {
+    localStorage.setItem(
+      'Heimdall.Feeds',
+      JSON.stringify({ HN: 'http://hn.com/rss', LWN: 'http://lwn.com/rss' }),
+    );
+    localStorage.setItem('Heimdall.LastDashboardFeed', 'LWN');
+    const { clearFeedsCache } = await import('../src/core/storage');
+    clearFeedsCache();
+
+    document.getElementById('view-home')!.style.display = 'none';
+    document.getElementById('view-feed')!.style.display = 'block';
+
+    MockXMLHttpRequest.nextResponse = `<?xml version="1.0"?><rss version="2.0"><channel>
+      <item><title>LWN Story</title><link>http://lwn.com/1</link></item>
+    </channel></rss>`;
+    MockXMLHttpRequest.nextStatus = 200;
+    MockXMLHttpRequest.nextUrlContainsError = false;
+
+    const { handleRefresh } = await import('../src/dashboard/dashboard');
+    handleRefresh();
+
+    const container = document.getElementById('feed-articles');
+    expect(container?.innerHTML).toContain('LWN Story');
   });
 });

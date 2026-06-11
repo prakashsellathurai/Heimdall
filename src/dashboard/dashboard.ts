@@ -1,4 +1,4 @@
-import { getMixedFeed, updateFeed } from '../core/feeds';
+import { getMixedFeed, updateFeed, updateIfReady } from '../core/feeds';
 import { addFeed, getFeedLinks, getFeeds, removeFeed } from '../core/storage';
 import { type FeedItem, STORAGE_KEYS } from '../types';
 
@@ -47,6 +47,10 @@ function setupDashboardEvents(): void {
 
   const closeBtn = document.getElementById('close-preview-btn');
   closeBtn?.addEventListener('click', closePreview);
+
+  document.querySelectorAll('#refresh-btn').forEach((btn) => {
+    btn.addEventListener('click', handleRefresh);
+  });
 }
 
 function showView(viewId: string, feedKey?: string | null): void {
@@ -151,6 +155,62 @@ function closePreview(): void {
   setTimeout(() => {
     if (frame) frame.src = 'about:blank';
   }, 300);
+}
+
+function handleRefresh(): void {
+  const homeView = document.getElementById('view-home');
+  const feedView = document.getElementById('view-feed');
+
+  if (homeView?.style.display !== 'none') {
+    const container = document.getElementById('home-articles');
+    if (!container) return;
+    container.innerHTML = 'Refreshing...';
+
+    const feeds = getFeeds();
+    const keys = Object.keys(feeds);
+    if (keys.length === 0) {
+      container.innerHTML = 'No articles found. Add some feeds in Settings!';
+      return;
+    }
+
+    let completed = 0;
+    keys.forEach((key) => {
+      updateIfReady(key, true, () => {
+        completed++;
+        if (completed === keys.length) {
+          getMixedFeed((links) => {
+            container.innerHTML = '';
+            if (links.length === 0) {
+              container.innerHTML = 'No articles found. Add some feeds in Settings!';
+              return;
+            }
+            let id = 1;
+            links.forEach((link) => {
+              container.appendChild(renderArticle(link, id++));
+            });
+          });
+        }
+      });
+    });
+  } else if (feedView?.style.display !== 'none') {
+    const feedKey = localStorage.getItem(STORAGE_KEYS.LAST_DASHBOARD_FEED);
+    if (!feedKey) return;
+    const container = document.getElementById('feed-articles');
+    if (!container) return;
+    container.innerHTML = 'Refreshing...';
+
+    updateIfReady(feedKey, true, (links) => {
+      container.innerHTML = '';
+      if (!links || links.length === 0) {
+        container.innerHTML = 'No articles found in this feed.';
+        return;
+      }
+      let id = 1;
+      links.forEach((link) => {
+        container.appendChild(renderArticle(link, id++));
+      });
+    });
+  }
 }
 
 function renderHomeFeed(): void {
@@ -265,6 +325,7 @@ function handleAddFeedDashboard(): void {
 export {
   closePreview,
   handleAddFeedDashboard,
+  handleRefresh,
   initDashboard,
   openInPreview,
   renderArticle,
